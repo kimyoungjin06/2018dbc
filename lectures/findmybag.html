@@ -11965,7 +11965,7 @@ a.anchor-link {
 <h1 id="1.-Site-&#46308;&#50668;&#45796;-&#48372;&#44592;">1. Site &#46308;&#50668;&#45796; &#48372;&#44592;<a class="anchor-link" href="#1.-Site-&#46308;&#50668;&#45796;-&#48372;&#44592;">&#182;</a></h1><p><a id='1'></a></p>
 <ul>
 <li><p>먼저 목표 site인 <a href="https://www.lost112.go.kr">https://www.lost112.go.kr</a>에서 분실물 탭을 살펴보자
-<img src="./201806_LOST112/figure1.PNG"></p>
+<img src="./findmybag/figure1.PNG"></p>
 </li>
 <li><p>사이트는 위 처럼 생겼고, 이 때 페이지의 주소는 다음과 같다.<br> <a href="https://www.lost112.go.kr/find/findList.do">https://www.lost112.go.kr/find/findList.do</a></p>
 </li>
@@ -11990,7 +11990,7 @@ a.anchor-link {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><img src="./201806_LOST112/figure2.PNG"></p>
+<p><img src="./findmybag/figure2.PNG"></p>
 <ul>
 <li>이 개발자 도구에서 Network tab을 보면 아직은 아무것도 없지만, 새로운 page를 load하면 불러오는 것들을 다음과 같이 나타나게 한다. 여기서 우리가바라볼 것은 .do와 같은 액션을 찾는 것이다. 이번 경우는 앞서 이야기했던 대로 findList.do이고 맨 위에 나타난다.</li>
 </ul>
@@ -12002,7 +12002,7 @@ a.anchor-link {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><img src="./201806_LOST112/figure3.PNG"></p>
+<p><img src="./findmybag/figure3.PNG"></p>
 <ul>
 <li>이 findList.do의 Headers tab을 보면 General, Response Headers, Request Headers, Form Data처럼 많은 항목을 담고 있다. (경우에 따라 달라질 수도 있다.) 여기서 마지막 Form Data항이 넘겨주는 인자들을 담고있다. <br> 보이는 것 처럼 PRDT_CL_NM:, ... 처럼 많은 인자들을 담고있는데, 인자 하나 하나씩 바꿔가면서 해당인자가 어떤 역할을 하는지 알 수 있다. 이번에 사용할 인자는 다음과 같다.</li>
 </ul>
@@ -12031,7 +12031,7 @@ a.anchor-link {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><img src="./201806_LOST112/figure4.PNG"></p>
+<p><img src="./findmybag/figure4.PNG"></p>
 <ul>
 <li>넘겨주는 값은 <code>=</code> 로 공백 없이 연결하고 인자사이는 <code>&amp;</code>로 붙여서 전달한다.<br> <em>data1</em>=<em>value1</em>&amp;<em>data2</em>=<em>value2</em>&amp;<em>data3</em>=<em>value3</em>&amp;...</li>
 <li>마지막으로  이 인자들은 <code>주소</code> + <code>?</code> + <code>인자</code>들 로 구성되서 전체 주소를 만든다.<br>다음의 주소로 들어갈 경우 인자들이 제대로 적용되어있는지 확인을 할 수 있다.<br>
@@ -13884,7 +13884,7 @@ var selectedSubMenuNo = &#34;&#34;;
 <h2 id="3.1-Parsing-&#46108;-html-&#47928;&#49436;&#50640;&#49436;-&#50896;&#54616;&#45716;-&#51221;&#48372;-scrap&#54616;&#44592;">3.1 Parsing &#46108; html &#47928;&#49436;&#50640;&#49436; &#50896;&#54616;&#45716; &#51221;&#48372; scrap&#54616;&#44592;<a class="anchor-link" href="#3.1-Parsing-&#46108;-html-&#47928;&#49436;&#50640;&#49436;-&#50896;&#54616;&#45716;-&#51221;&#48372;-scrap&#54616;&#44592;">&#182;</a></h2><ul>
 <li>방법 2: 해당 page의 Chrome의 개발자 도구로 돌아가서 Elements tab을 보자.<ul>
 <li>Elements에는 html문서가 parsing되어서 나타나있다.<br> 아래 fig.에 빨간 동그라미가 쳐져있는 부분(단축키 <code>Ctrl</code> + <code>Shift</code> + <code>C</code>)를 누르고 화면에서 찾고자 하는 부분을 클릭하면 해당 html 문서의 부분이 나타나게 된다.
-<img src="./201806_LOST112/figure5.PNG"></li>
+<img src="./findmybag/figure5.PNG"></li>
 </ul>
 </li>
 </ul>
@@ -13896,7 +13896,7 @@ var selectedSubMenuNo = &#34;&#34;;
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="3.1-Parsing-&#46108;-html-&#47928;&#49436;&#50640;&#49436;-&#50896;&#54616;&#45716;-&#51221;&#48372;-scrap&#54616;&#44592;">3.1 Parsing &#46108; html &#47928;&#49436;&#50640;&#49436; &#50896;&#54616;&#45716; &#51221;&#48372; scrap&#54616;&#44592;<a class="anchor-link" href="#3.1-Parsing-&#46108;-html-&#47928;&#49436;&#50640;&#49436;-&#50896;&#54616;&#45716;-&#51221;&#48372;-scrap&#54616;&#44592;">&#182;</a></h2><p><img src="./201806_LOST112/figure6.PNG"></p>
+<h2 id="3.1-Parsing-&#46108;-html-&#47928;&#49436;&#50640;&#49436;-&#50896;&#54616;&#45716;-&#51221;&#48372;-scrap&#54616;&#44592;">3.1 Parsing &#46108; html &#47928;&#49436;&#50640;&#49436; &#50896;&#54616;&#45716; &#51221;&#48372; scrap&#54616;&#44592;<a class="anchor-link" href="#3.1-Parsing-&#46108;-html-&#47928;&#49436;&#50640;&#49436;-&#50896;&#54616;&#45716;-&#51221;&#48372;-scrap&#54616;&#44592;">&#182;</a></h2><p><img src="./findmybag/figure6.PNG"></p>
 <ul>
 <li>방법 2: 해당 page의 Chrome의 개발자 도구로 돌아가서 Elements tab을 보자.<ul>
 <li>fig.에 1에 해당하는 부분을 누르고, 찾고자하는 2. 관리번호를 누르면 Elements의 3.에 해당 위치가 나타나게 된다.</li>
@@ -13915,7 +13915,7 @@ var selectedSubMenuNo = &#34;&#34;;
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="3.2-CSS-Selector-&#49324;&#50857;&#48277;">3.2 CSS Selector &#49324;&#50857;&#48277;<a class="anchor-link" href="#3.2-CSS-Selector-&#49324;&#50857;&#48277;">&#182;</a></h2><p><img src="./201806_LOST112/figure6.PNG"></p>
+<h2 id="3.2-CSS-Selector-&#49324;&#50857;&#48277;">3.2 CSS Selector &#49324;&#50857;&#48277;<a class="anchor-link" href="#3.2-CSS-Selector-&#49324;&#50857;&#48277;">&#182;</a></h2><p><img src="./findmybag/figure6.PNG"></p>
 <ul>
 <li>우리가 원하는 관리번호는 <code>...&lt;div&gt;&lt;table&gt;&lt;thread&gt;&lt;tr&gt;&lt;th&gt;</code>에 위치해있다.</li>
 <li>CSS Selector를 사용하는 법은 다음과 같다. <a href="https://code.tutsplus.com/ko/tutorials/the-30-css-selectors-you-must-memorize--net-16048">CSS Selector</a></li>
