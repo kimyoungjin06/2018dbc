@@ -13923,7 +13923,7 @@ var selectedSubMenuNo = &#34;&#34;;
 <li><code>.type01 tr th</code>에서 <code>.type01</code>은 table에 해당하는 class 값으로 select한다는 뜻이다.<br> id값으로 select할 경우는 <code>#type01</code>과 같이 사용하면 된다. 좀 더 자세한 사용법은 위의 link를 참고하자.</li>
 <li>아래 결과는 해당 문서에서 모두 동일한 결과를 나타낸다.</li>
 <li>찾은 결과가 여러개일 경우 순서대로 <code>list</code> 형태로 결과값을 돌려준다.</li>
-<li><strong>요소이름에 공백이 들어간 경우 <code>```를</code>.```으로 대체해서 검색한다.</strong><div class="highlight"><pre><span></span><span class="n">soup</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;div table thead tr th&#39;</span><span class="p">)</span>
+<li><strong>요소이름에 공백이 들어간 경우 <code>.</code>으로 대체해서 검색한다.</strong><div class="highlight"><pre><span></span><span class="n">soup</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;div table thead tr th&#39;</span><span class="p">)</span>
 <span class="n">soup</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;div thead tr th&#39;</span><span class="p">)</span>
 <span class="n">soup</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;.type01 thead tr th&#39;</span><span class="p">)</span>
 </pre></div>
