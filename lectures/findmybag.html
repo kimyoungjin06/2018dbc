@@ -9,13 +9,12 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-<title>Untitled slides</title>
+<title>Find my bag slides</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 
 <!-- General and theme style sheets -->
-
 <link rel="stylesheet" href="reveal.js/css/reveal.css">
 <link rel="stylesheet" href="reveal.js/css/theme/simple.css" id="theme">
 
@@ -11902,13 +11901,305 @@ a.anchor-link {
 <div class="reveal">
 <div class="slides">
 <section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Python&#51012;-&#51060;&#50857;&#54620;-Scraping-&#50696;&#51228;-1">Python&#51012; &#51060;&#50857;&#54620; Scraping &#50696;&#51228; 1<a class="anchor-link" href="#Python&#51012;-&#51060;&#50857;&#54620;-Scraping-&#50696;&#51228;-1">&#182;</a></h1><h3>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;editor: Young Jin Kim<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;last edit: 2018.06.18 Thu</h3>
+<ul>
+<li>Requests와 BeautifulSoup 사용해서 경찰청 유실물 기록 가져오기 <br>
+<a href="https://www.lost112.go.kr">https://www.lost112.go.kr</a></li>
+</ul>
+<h2 id="0.-Packages-importing"><a href="#/1">0. Packages importing</a><a class="anchor-link" href="#0.-Packages-importing">&#182;</a></h2><h2 id="1.-Site-&#46308;&#50668;&#45796;&#48372;&#44592;"><a href="#/2">1. Site &#46308;&#50668;&#45796;&#48372;&#44592;</a><a class="anchor-link" href="#1.-Site-&#46308;&#50668;&#45796;&#48372;&#44592;">&#182;</a></h2><h2 id="2.-split&#44284;-join&#51004;&#47196;-key&#44050;-&#48320;&#44221;&#54616;&#44592;"><a href="#/3">2. split&#44284; join&#51004;&#47196; key&#44050; &#48320;&#44221;&#54616;&#44592;</a><a class="anchor-link" href="#2.-split&#44284;-join&#51004;&#47196;-key&#44050;-&#48320;&#44221;&#54616;&#44592;">&#182;</a></h2><h2 id="3.-requests&#50752;-BS&#47484;-&#51060;&#50857;&#54644;-&#54168;&#51060;&#51648;-&#44545;&#50612;&#50724;&#44592;-"><a href="#/4">3. requests&#50752; BS&#47484; &#51060;&#50857;&#54644; &#54168;&#51060;&#51648; &#44545;&#50612;&#50724;&#44592; </a><a class="anchor-link" href="#3.-requests&#50752;-BS&#47484;-&#51060;&#50857;&#54644;-&#54168;&#51060;&#51648;-&#44545;&#50612;&#50724;&#44592;-">&#182;</a></h2><h2 id="4.-&#52572;&#51333;-&#53076;&#46300;"><a href="#/5">4. &#52572;&#51333; &#53076;&#46300;</a><a class="anchor-link" href="#4.-&#52572;&#51333;-&#53076;&#46300;">&#182;</a></h2>
+</div>
+</div>
+</div></section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li><p>웹페이지는 .html 뿐이라고 생각할 수 있지만, <br>java를 사용하는 경우 동적으로 웹페이지를 불러온다.</p>
+</li>
+<li><p>대표적인 것이 JSP(Java Server Pages)가 있다.<br> 개발자 도구(크롬 기준 F12)에서 네트워크 탭을 열어 놓은 뒤 웹페이지를 새로 불러오면 .jsp, .ajax, .do 등 많은 것들이 보인다.</p>
+</li>
+</ul>
+<ul>
+<li>이번 예제에서 눈여겨 볼 것은 .do 이다.<br> 이는 자바 플랫폼 기반의 스프링 프레임워크에서 사용되며 변수들을 받아서 동적으로 웹페이지를 불러온다.<br> 특히, 현재 전자정부 표준프레임워크의 기반 기술로서 <strong>우리나라의 공공기간 웹 서비스</strong> 개발에 많이 쓰인다.</li>
+</ul>
+<ul>
+<li>이번 예제에서는 이러한 .do 파일로 이루어진 페이지를 스크래핑 하는 예제를 다뤄보겠다.</li>
+</ul>
+
+</div>
+</div>
+</div></section></section><section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="0.-Packages-importing">0. Packages importing<a class="anchor-link" href="#0.-Packages-importing">&#182;</a></h1><h3>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;;패키지 불러오기</h3>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span> <span class="k">as</span> <span class="nn">rq</span> <span class="c1"># 웹페이지 불러오는 용도</span>
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="k">import</span> <span class="n">BeautifulSoup</span> <span class="c1"># html문서 파싱하는 용도</span>
+<span class="kn">import</span> <span class="nn">time</span> <span class="c1"># 트래픽 관리 용도</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div></section></section><section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="1.-Site-&#46308;&#50668;&#45796;-&#48372;&#44592;">1. Site &#46308;&#50668;&#45796; &#48372;&#44592;<a class="anchor-link" href="#1.-Site-&#46308;&#50668;&#45796;-&#48372;&#44592;">&#182;</a></h1><p><a id='1'></a></p>
+<ul>
+<li><p>먼저 목표 site인 <a href="https://www.lost112.go.kr">https://www.lost112.go.kr</a>에서 분실물 탭을 살펴보자
+<img src="./201806_LOST112/figure1.PNG"></p>
+</li>
+<li><p>사이트는 위 처럼 생겼고, 이 때 페이지의 주소는 다음과 같다.<br> <a href="https://www.lost112.go.kr/find/findList.do">https://www.lost112.go.kr/find/findList.do</a></p>
+</li>
+</ul>
+
+</div>
+</div>
+</div></section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>이번 예제의 경우는 주소에서 findList.do가 숨겨져 있지 않고 바로 보여서 쉬운 경우이다.</li>
+<li>하지만 뒤에 많은 인자들이 숨어있다. 따라서 개발자 도구(크롬 기준 F12)에서 인자들을 파악한다.</li>
+</ul>
+
+</div>
+</div>
+</div></section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><img src="./201806_LOST112/figure2.PNG"></p>
+<ul>
+<li>이 개발자 도구에서 Network tab을 보면 아직은 아무것도 없지만, 새로운 page를 load하면 불러오는 것들을 다음과 같이 나타나게 한다. 여기서 우리가바라볼 것은 .do와 같은 액션을 찾는 것이다. 이번 경우는 앞서 이야기했던 대로 findList.do이고 맨 위에 나타난다.</li>
+</ul>
+
+</div>
+</div>
+</div></section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><img src="./201806_LOST112/figure3.PNG"></p>
+<ul>
+<li>이 findList.do의 Headers tab을 보면 General, Response Headers, Request Headers, Form Data처럼 많은 항목을 담고 있다. (경우에 따라 달라질 수도 있다.) 여기서 마지막 Form Data항이 넘겨주는 인자들을 담고있다. <br> 보이는 것 처럼 PRDT_CL_NM:, ... 처럼 많은 인자들을 담고있는데, 인자 하나 하나씩 바꿔가면서 해당인자가 어떤 역할을 하는지 알 수 있다. 이번에 사용할 인자는 다음과 같다.</li>
+</ul>
+
+</div>
+</div>
+</div></section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>START_YMD: 기간 처음</li>
+<li>END_YMD: 기간 끝</li>
+<li>FD_LCT_CD: 습득지역 ; 서울특별시 코드; LCA000</li>
+<li>pageIndex: page 번호</li>
+</ul>
+<ul>
+<li>Form Data 옆에 view source를 누르면 findList.do가 어떤 형식으로 인자를 받는지 알 수 있다.</li>
+</ul>
+
+</div>
+</div>
+</div></section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><img src="./201806_LOST112/figure4.PNG"></p>
+<ul>
+<li>넘겨주는 값은 <code>=</code> 로 공백 없이 연결하고 인자사이는 <code>&amp;</code>로 붙여서 전달한다.<br> <em>data1</em>=<em>value1</em>&amp;<em>data2</em>=<em>value2</em>&amp;<em>data3</em>=<em>value3</em>&amp;...</li>
+<li>마지막으로  이 인자들은 <code>주소</code> + <code>?</code> + <code>인자</code>들 로 구성되서 전체 주소를 만든다.<br>다음의 주소로 들어갈 경우 인자들이 제대로 적용되어있는지 확인을 할 수 있다.<br>
+<a href="https://www.lost112.go.kr/find/findList.do?PRDT_CL_NM=&amp;PRDT_CL_CD01=&amp;PRDT_CL_CD02=&amp;START_YMD=20180612&amp;END_YMD=20180626&amp;PRDT_NM=&amp;DEP_PLACE=&amp;SITE=&amp;PLACE_SE_CD=&amp;FD_LCT_CD=LCA000&amp;IN_NM=&amp;ATC_ID=&amp;MDCD=&amp;SRNO=&amp;F_ATC_ID=&amp;pageIndex=1&amp;MENU_NO=">https://www.lost112.go.kr/find/findList.do?PRDT_CL_NM=&amp;PRDT_CL_CD01=&amp;PRDT_CL_CD02=&amp;START_YMD=20180612&amp;END_YMD=20180626&amp;PRDT_NM=&amp;DEP_PLACE=&amp;SITE=&amp;PLACE_SE_CD=&amp;FD_LCT_CD=LCA000&amp;IN_NM=&amp;ATC_ID=&amp;MDCD=&amp;SRNO=&amp;F_ATC_ID=&amp;pageIndex=1&amp;MENU_NO=</a></li>
+</ul>
+
+</div>
+</div>
+</div></section></section><section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="2.-split&#44284;-join&#51004;&#47196;-key&#44050;-&#48320;&#44221;&#54616;&#44592;">2. <code>split</code>&#44284; <code>join</code>&#51004;&#47196; key&#44050; &#48320;&#44221;&#54616;&#44592;<a class="anchor-link" href="#2.-split&#44284;-join&#51004;&#47196;-key&#44050;-&#48320;&#44221;&#54616;&#44592;">&#182;</a></h1><ul>
+<li>전체 코드</li>
+</ul>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>pip install --upgrade pip
-<span class="o">!</span>pip install RISE
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">head</span> <span class="o">=</span> <span class="s1">&#39;https://www.lost112.go.kr/find/findList.do&#39;</span>
+<span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;PRDT_CL_NM=&amp;PRDT_CL_CD01=&amp;PRDT_CL_CD02=&amp;START_YMD=20180612&amp;END_YMD=20180626&amp;PRDT_NM=&amp;DEP_PLACE=&amp;SITE=&amp;PLACE_SE_CD=&amp;FD_LCT_CD=&amp;IN_NM=&amp;ATC_ID=&amp;MDCD=&amp;SRNO=&amp;F_ATC_ID=&amp;pageIndex=1&amp;MENU_NO=&#39;</span>
+
+<span class="n">key</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;&amp;&quot;</span><span class="p">)]</span>
+<span class="n">key</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;20180612&#39;</span> <span class="c1"># START DATE</span>
+<span class="n">key</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;20180626&#39;</span> <span class="c1"># END DATE</span>
+<span class="n">key</span><span class="p">[</span><span class="mi">9</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;LCA000&#39;</span> <span class="c1"># LOCALE</span>
+<span class="n">key</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span> <span class="c1"># PAGE</span>
+
+<span class="n">key</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;=&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">key</span><span class="p">]</span>
+<span class="n">key</span> <span class="o">=</span> <span class="s2">&quot;&amp;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+<span class="n">url</span> <span class="o">=</span> <span class="n">head</span> <span class="o">+</span> <span class="s1">&#39;?&#39;</span> <span class="o">+</span> <span class="n">key</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div></section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li><code>url</code>을 <code>head</code> + <code>key</code>로 구성하고, 각 인자들의 값을 바꿀 수 있도록 세팅한다.</li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">head</span> <span class="o">=</span> <span class="s1">&#39;https://www.lost112.go.kr/find/findList.do&#39;</span>
+<span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;PRDT_CL_NM=&amp;PRDT_CL_CD01=&amp;PRDT_CL_CD02=&amp;START_YMD=20180612&amp;END_YMD=20180626&amp;PRDT_NM=&amp;DEP_PLACE=&amp;SITE=&amp;PLACE_SE_CD=&amp;FD_LCT_CD=&amp;IN_NM=&amp;ATC_ID=&amp;MDCD=&amp;SRNO=&amp;F_ATC_ID=&amp;pageIndex=1&amp;MENU_NO=&#39;</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div></section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>인자들을 내장함수 <code>split</code>을 통해 리스트로 쪼개고 값을 넘겨준다.<ul>
+<li><code>split</code> 사용법:<br><code>&lt;변수&gt;.split(&lt;구분자&gt;)</code><br> ex)<div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="s2">&quot;1,2,3,4&quot;</span> 
+<span class="o">&gt;</span> <span class="n">y</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+<span class="o">&gt;</span> <span class="n">y</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+</pre></div>
+</li>
+</ul>
+</li>
+<li>먼저 인자 단위로 쪼개기 위해 <code>&amp;</code>로 쪼개고, 인자와 값을 쪼개기 위해 <code>=</code>으로 쪼갠다.</li>
+<li>쪼개진 key는 17x2의 값을 가지고 있다.</li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">key</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;&amp;&quot;</span><span class="p">)]</span>
+<span class="n">key</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;20180612&#39;</span> <span class="c1"># START DATE</span>
+<span class="n">key</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;20180626&#39;</span> <span class="c1"># END DATE</span>
+<span class="n">key</span><span class="p">[</span><span class="mi">9</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;LCA000&#39;</span> <span class="c1"># LOCALE</span>
+<span class="n">key</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span> <span class="c1"># PAGE</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div></section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>쪼개진 key들을 내장함수 <code>join</code>을 이용해 다시 문자열로 합쳐준다.<ul>
+<li><code>join</code> 사용법:<br> <code>&lt;구분자&gt;.join(&lt;변수&gt;)</code><br> ex)<div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+<span class="o">&gt;</span> <span class="n">y</span> <span class="o">=</span> <span class="s2">&quot;~&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="o">&gt;</span> <span class="n">y</span>
+<span class="s2">&quot;1~2~3~4&quot;</span>
+</pre></div>
+</li>
+</ul>
+</li>
+<li>두 번 <code>split</code> 했으니 두 번 <code>join</code> 해준다. 최종적으로 <code>key</code>는 다시 하나의 문자열이 된다.</li>
+<li>이 <code>key</code>를 다시 <code>head</code>와 합쳐 <code>url</code>을 완성한다.</li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">key</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;=&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">key</span><span class="p">]</span>
+<span class="n">key</span> <span class="o">=</span> <span class="s2">&quot;&amp;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+<span class="n">url</span> <span class="o">=</span> <span class="n">head</span> <span class="o">+</span> <span class="s1">&#39;?&#39;</span> <span class="o">+</span> <span class="n">key</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div></section></section><section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="3.-requests&#50752;-BS&#47484;-&#51060;&#50857;&#54644;-&#54168;&#51060;&#51648;-&#44545;&#50612;&#50724;&#44592;">3. requests&#50752; BS&#47484; &#51060;&#50857;&#54644; &#54168;&#51060;&#51648; &#44545;&#50612;&#50724;&#44592;<a class="anchor-link" href="#3.-requests&#50752;-BS&#47484;-&#51060;&#50857;&#54644;-&#54168;&#51060;&#51648;-&#44545;&#50612;&#50724;&#44592;">&#182;</a></h1><ul>
+<li>전체 코드</li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">source</span> <span class="o">=</span> <span class="n">rq</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+<span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">text</span><span class="p">,</span><span class="s1">&#39;html.parser&#39;</span><span class="p">)</span>
+<span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;.type01 tr th&#39;</span><span class="p">)]</span>
+<span class="n">temp</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\r</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;.type01 tr td&#39;</span><span class="p">)]</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">rows</span> <span class="o">=</span> <span class="p">[</span><span class="n">temp</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">n</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">temp</span><span class="p">),</span><span class="n">n</span><span class="p">)]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -11925,50 +12216,17 @@ a.anchor-link {
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Collecting pip
-  Downloading https://files.pythonhosted.org/packages/0f/74/ecd13431bcc456ed390b44c8a6e917c1820365cbebcb6a8974d1cd045ab4/pip-10.0.1-py2.py3-none-any.whl (1.3MB)
-    100% |████████████████████████████████| 1.3MB 393kB/s ta 0:00:01
-Installing collected packages: pip
-  Found existing installation: pip 9.0.1
-    Uninstalling pip-9.0.1:
-      Successfully uninstalled pip-9.0.1
-Successfully installed pip-10.0.1
-Requirement already satisfied: RISE in /opt/conda/lib/python3.6/site-packages (5.3.0)
-Requirement already satisfied: notebook&gt;=5.5.0 in /opt/conda/lib/python3.6/site-packages (from RISE) (5.5.0)
-Requirement already satisfied: Send2Trash in /opt/conda/lib/python3.6/site-packages (from notebook&gt;=5.5.0-&gt;RISE) (1.5.0)
-Requirement already satisfied: jupyter-core&gt;=4.4.0 in /opt/conda/lib/python3.6/site-packages (from notebook&gt;=5.5.0-&gt;RISE) (4.4.0)
-Requirement already satisfied: jupyter-client&gt;=5.2.0 in /opt/conda/lib/python3.6/site-packages (from notebook&gt;=5.5.0-&gt;RISE) (5.2.3)
-Requirement already satisfied: nbformat in /opt/conda/lib/python3.6/site-packages (from notebook&gt;=5.5.0-&gt;RISE) (4.4.0)
-Requirement already satisfied: terminado&gt;=0.8.1 in /opt/conda/lib/python3.6/site-packages (from notebook&gt;=5.5.0-&gt;RISE) (0.8.1)
-Requirement already satisfied: nbconvert in /opt/conda/lib/python3.6/site-packages (from notebook&gt;=5.5.0-&gt;RISE) (5.3.1)
-Requirement already satisfied: jinja2 in /opt/conda/lib/python3.6/site-packages (from notebook&gt;=5.5.0-&gt;RISE) (2.10)
-Requirement already satisfied: tornado&gt;=4 in /opt/conda/lib/python3.6/site-packages (from notebook&gt;=5.5.0-&gt;RISE) (4.5.2)
-Requirement already satisfied: ipykernel in /opt/conda/lib/python3.6/site-packages (from notebook&gt;=5.5.0-&gt;RISE) (4.7.0)
-Requirement already satisfied: ipython-genutils in /opt/conda/lib/python3.6/site-packages (from notebook&gt;=5.5.0-&gt;RISE) (0.2.0)
-Requirement already satisfied: pyzmq&gt;=17 in /opt/conda/lib/python3.6/site-packages (from notebook&gt;=5.5.0-&gt;RISE) (17.0.0)
-Requirement already satisfied: traitlets&gt;=4.2.1 in /opt/conda/lib/python3.6/site-packages (from notebook&gt;=5.5.0-&gt;RISE) (4.3.2)
-Requirement already satisfied: python-dateutil&gt;=2.1 in /opt/conda/lib/python3.6/site-packages (from jupyter-client&gt;=5.2.0-&gt;notebook&gt;=5.5.0-&gt;RISE) (2.6.1)
-Requirement already satisfied: jsonschema!=2.5.0,&gt;=2.4 in /opt/conda/lib/python3.6/site-packages (from nbformat-&gt;notebook&gt;=5.5.0-&gt;RISE) (2.6.0)
-Requirement already satisfied: bleach in /opt/conda/lib/python3.6/site-packages (from nbconvert-&gt;notebook&gt;=5.5.0-&gt;RISE) (1.5.0)
-Requirement already satisfied: testpath in /opt/conda/lib/python3.6/site-packages (from nbconvert-&gt;notebook&gt;=5.5.0-&gt;RISE) (0.3.1)
-Requirement already satisfied: mistune&gt;=0.7.4 in /opt/conda/lib/python3.6/site-packages (from nbconvert-&gt;notebook&gt;=5.5.0-&gt;RISE) (0.8.3)
-Requirement already satisfied: pandocfilters&gt;=1.4.1 in /opt/conda/lib/python3.6/site-packages (from nbconvert-&gt;notebook&gt;=5.5.0-&gt;RISE) (1.4.1)
-Requirement already satisfied: pygments in /opt/conda/lib/python3.6/site-packages (from nbconvert-&gt;notebook&gt;=5.5.0-&gt;RISE) (2.2.0)
-Requirement already satisfied: entrypoints&gt;=0.2.2 in /opt/conda/lib/python3.6/site-packages (from nbconvert-&gt;notebook&gt;=5.5.0-&gt;RISE) (0.2.3)
-Requirement already satisfied: MarkupSafe&gt;=0.23 in /opt/conda/lib/python3.6/site-packages (from jinja2-&gt;notebook&gt;=5.5.0-&gt;RISE) (1.0)
-Requirement already satisfied: ipython&gt;=4.0.0 in /opt/conda/lib/python3.6/site-packages (from ipykernel-&gt;notebook&gt;=5.5.0-&gt;RISE) (6.2.1)
-Requirement already satisfied: six in /opt/conda/lib/python3.6/site-packages (from traitlets&gt;=4.2.1-&gt;notebook&gt;=5.5.0-&gt;RISE) (1.11.0)
-Requirement already satisfied: decorator in /opt/conda/lib/python3.6/site-packages (from traitlets&gt;=4.2.1-&gt;notebook&gt;=5.5.0-&gt;RISE) (4.1.2)
-Requirement already satisfied: html5lib!=0.9999,!=0.99999,&lt;0.99999999,&gt;=0.999 in /opt/conda/lib/python3.6/site-packages (from bleach-&gt;nbconvert-&gt;notebook&gt;=5.5.0-&gt;RISE) (0.9999999)
-Requirement already satisfied: pickleshare in /opt/conda/lib/python3.6/site-packages (from ipython&gt;=4.0.0-&gt;ipykernel-&gt;notebook&gt;=5.5.0-&gt;RISE) (0.7.4)
-Requirement already satisfied: jedi&gt;=0.10 in /opt/conda/lib/python3.6/site-packages (from ipython&gt;=4.0.0-&gt;ipykernel-&gt;notebook&gt;=5.5.0-&gt;RISE) (0.10.2)
-Requirement already satisfied: prompt-toolkit&lt;2.0.0,&gt;=1.0.4 in /opt/conda/lib/python3.6/site-packages (from ipython&gt;=4.0.0-&gt;ipykernel-&gt;notebook&gt;=5.5.0-&gt;RISE) (1.0.15)
-Requirement already satisfied: simplegeneric&gt;0.8 in /opt/conda/lib/python3.6/site-packages (from ipython&gt;=4.0.0-&gt;ipykernel-&gt;notebook&gt;=5.5.0-&gt;RISE) (0.8.1)
-Requirement already satisfied: pexpect; sys_platform != &#34;win32&#34; in /opt/conda/lib/python3.6/site-packages (from ipython&gt;=4.0.0-&gt;ipykernel-&gt;notebook&gt;=5.5.0-&gt;RISE) (4.3.0)
-Requirement already satisfied: setuptools&gt;=18.5 in /opt/conda/lib/python3.6/site-packages (from ipython&gt;=4.0.0-&gt;ipykernel-&gt;notebook&gt;=5.5.0-&gt;RISE) (36.6.0)
-Requirement already satisfied: wcwidth in /opt/conda/lib/python3.6/site-packages (from prompt-toolkit&lt;2.0.0,&gt;=1.0.4-&gt;ipython&gt;=4.0.0-&gt;ipykernel-&gt;notebook&gt;=5.5.0-&gt;RISE) (0.1.7)
-Requirement already satisfied: ptyprocess&gt;=0.5 in /opt/conda/lib/python3.6/site-packages (from pexpect; sys_platform != &#34;win32&#34;-&gt;ipython&gt;=4.0.0-&gt;ipykernel-&gt;notebook&gt;=5.5.0-&gt;RISE) (0.5.2)
-<span class="ansi-red-fg">tensorflow 1.3.0 requires tensorflow-tensorboard&lt;0.2.0,&gt;=0.1.0, which is not installed.</span>
+<pre>[&#39;관리번호&#39;, &#39;습득물명&#39;, &#39;분실자명&#39;, &#39;보관장소&#39;, &#39;연락처&#39;, &#39;주운일자&#39;]
+[&#39;V0002502D06280018&#39;, &#39;카카오뱅크 라이언카드&#39;, &#39;-&#39;, &#39;CGV(신촌점)&#39;, &#39;02-373-2995&#39;, &#39;2018-06-26&#39;]
+[&#39;V0002502D06280016&#39;, &#39;KB 국민카드&#39;, &#39;-&#39;, &#39;CGV(신촌점)&#39;, &#39;02-373-2995&#39;, &#39;2018-06-26&#39;]
+[&#39;V0002502D06280014&#39;, &#39;신한카드&#39;, &#39;-&#39;, &#39;CGV(신촌점)&#39;, &#39;02-373-2995&#39;, &#39;2018-06-25&#39;]
+[&#39;V0002502D06280012&#39;, &#39;신한카드&#39;, &#39;-&#39;, &#39;CGV(신촌점)&#39;, &#39;02-373-2995&#39;, &#39;2018-06-25&#39;]
+[&#39;V0002502D06280010&#39;, &#39;열쇠&#39;, &#39;-&#39;, &#39;CGV(신촌점)&#39;, &#39;02-373-2995&#39;, &#39;2018-06-24&#39;]
+[&#39;V0002502D06280008&#39;, &#39;카페베네 카드&#39;, &#39;-&#39;, &#39;CGV(신촌점)&#39;, &#39;02-373-2995&#39;, &#39;2018-06-24&#39;]
+[&#39;V0002502D06280006&#39;, &#39;주민등록증&#39;, &#39;-&#39;, &#39;CGV(신촌점)&#39;, &#39;02-373-2995&#39;, &#39;2018-06-23&#39;]
+[&#39;V0002502D06280004&#39;, &#39;우리v체크카드&#39;, &#39;-&#39;, &#39;CGV(신촌점)&#39;, &#39;02-373-2995&#39;, &#39;2018-06-23&#39;]
+[&#39;V0002502D06280002&#39;, &#39;cu멤버쉽&amp;교통카드&#39;, &#39;-&#39;, &#39;CGV(신촌점)&#39;, &#39;02-373-2995&#39;, &#39;2018-06-22&#39;]
+[&#39;F2018062800002828&#39;, &#39;삼성 폴더폰&#39;, &#39;-&#39;, &#39;서울중부경찰서&#39;, &#39;02-3396-9156&#39;, &#39;2018-06-19&#39;]
 </pre>
 </div>
 </div>
@@ -11977,13 +12235,50 @@ Requirement already satisfied: ptyprocess&gt;=0.5 in /opt/conda/lib/python3.6/si
 </div>
 
 </div></section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="3.1-html-&#47928;&#49436;-&#54028;&#49905;&#54616;&#44592;">3.1 html &#47928;&#49436; &#54028;&#49905;&#54616;&#44592;<a class="anchor-link" href="#3.1-html-&#47928;&#49436;-&#54028;&#49905;&#54616;&#44592;">&#182;</a></h2><ul>
+<li><code>requests</code>에 <code>get</code>함수를 통해 url과 통신한다.</li>
+<li>다음으로 BeautifulSoup을 이용해 html 문서를 parsing한다.</li>
+</ul>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>jupyter-nbextension <span class="nb">enable</span> rise --py --sys-prefix
-<span class="o">!</span>jupyter-nbextension install rise --py --sys-prefix
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">source</span> <span class="o">=</span> <span class="n">rq</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+<span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">text</span><span class="p">,</span><span class="s1">&#39;html.parser&#39;</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div></section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="3.1-Parsing-&#46108;-html-&#47928;&#49436;&#50640;&#49436;-&#50896;&#54616;&#45716;-&#51221;&#48372;-scrap&#54616;&#44592;">3.1 Parsing &#46108; html &#47928;&#49436;&#50640;&#49436; &#50896;&#54616;&#45716; &#51221;&#48372; scrap&#54616;&#44592;<a class="anchor-link" href="#3.1-Parsing-&#46108;-html-&#47928;&#49436;&#50640;&#49436;-&#50896;&#54616;&#45716;-&#51221;&#48372;-scrap&#54616;&#44592;">&#182;</a></h2><ul>
+<li>먼저 parsing이 된 <code>soup</code>을 살펴보자.</li>
+<li>방법 1: 숙련된 사람은 아래의 html파일에서 <code>Ctrl</code> + <code>F</code>로도 잘 찾는다.<br> 하지만 중복된 정보가 많을 경우, 방법 2가 더 간편하다.</li>
+</ul>
+
+</div>
+</div>
+</div></section><section>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">soup</span>
 </pre></div>
 
 </div>
@@ -11996,184 +12291,1939 @@ Requirement already satisfied: ptyprocess&gt;=0.5 in /opt/conda/lib/python3.6/si
 
 <div class="output_area">
 
-<div class="prompt"></div>
+<div class="prompt output_prompt">Out[8]:</div>
 
 
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Enabling notebook extension rise/main...
-      - Validating: <span class="ansi-green-fg">OK</span>
-Installing /opt/conda/lib/python3.6/site-packages/rise/static -&gt; rise
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/rise.png -&gt; /opt/conda/share/jupyter/nbextensions/rise/rise.png
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/rise.yaml -&gt; /opt/conda/share/jupyter/nbextensions/rise/rise.yaml
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/main.css -&gt; /opt/conda/share/jupyter/nbextensions/rise/main.css
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/README.md -&gt; /opt/conda/share/jupyter/nbextensions/rise/README.md
-Up to date: /opt/conda/share/jupyter/nbextensions/rise/main.js
-Making directory: /opt/conda/share/jupyter/nbextensions/rise/reveal.js
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/.npmignore -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/.npmignore
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/index.html -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/index.html
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/bower.json -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/bower.json
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/README.md -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/README.md
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/.travis.yml -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/.travis.yml
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/demo.html -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/demo.html
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/Gruntfile.js -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/Gruntfile.js
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/package.json -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/package.json
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/CONTRIBUTING.md -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/CONTRIBUTING.md
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/LICENSE -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/LICENSE
-Making directory: /opt/conda/share/jupyter/nbextensions/rise/reveal.js/test
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/test/qunit-1.12.0.css -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/test/qunit-1.12.0.css
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/test/test-markdown-external.js -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/test/test-markdown-external.js
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/test/test-pdf.js -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/test/test-pdf.js
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/test/test-markdown.js -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/test/test-markdown.js
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/test/qunit-1.12.0.js -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/test/qunit-1.12.0.js
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/test/test-pdf.html -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/test/test-pdf.html
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/test/test-markdown-element-attributes.js -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/test/test-markdown-element-attributes.js
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/test/simple.md -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/test/simple.md
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/test/test-markdown-slide-attributes.html -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/test/test-markdown-slide-attributes.html
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/test/test-markdown-options.js -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/test/test-markdown-options.js
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/test/test-markdown-options.html -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/test/test-markdown-options.html
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/test/test.html -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/test/test.html
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/test/test-markdown-slide-attributes.js -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/test/test-markdown-slide-attributes.js
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/test/test-markdown-external.html -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/test/test-markdown-external.html
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/test/test-markdown.html -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/test/test-markdown.html
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/test/test.js -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/test/test.js
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/test/test-markdown-element-attributes.html -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/test/test-markdown-element-attributes.html
-Making directory: /opt/conda/share/jupyter/nbextensions/rise/reveal.js/test/examples
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/test/examples/slide-transitions.html -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/test/examples/slide-transitions.html
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/test/examples/barebones.html -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/test/examples/barebones.html
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/test/examples/slide-backgrounds.html -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/test/examples/slide-backgrounds.html
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/test/examples/math.html -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/test/examples/math.html
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/test/examples/embedded-media.html -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/test/examples/embedded-media.html
-Making directory: /opt/conda/share/jupyter/nbextensions/rise/reveal.js/test/examples/assets
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/test/examples/assets/image1.png -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/test/examples/assets/image1.png
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/test/examples/assets/image2.png -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/test/examples/assets/image2.png
-Making directory: /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/css/reveal.css.upstream -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/reveal.css.upstream
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/css/reveal.css -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/reveal.css
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/css/reveal.scss -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/reveal.scss
-Making directory: /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/theme
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/css/theme/league.css -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/theme/league.css
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/css/theme/solarized.css -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/theme/solarized.css
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/css/theme/beige.css -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/theme/beige.css
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/css/theme/blood.css -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/theme/blood.css
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/css/theme/serif.css -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/theme/serif.css
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/css/theme/README.md -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/theme/README.md
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/css/theme/night.css -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/theme/night.css
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/css/theme/sky.css -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/theme/sky.css
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/css/theme/white.css -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/theme/white.css
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/css/theme/simple.css -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/theme/simple.css
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/css/theme/moon.css -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/theme/moon.css
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/css/theme/black.css -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/theme/black.css
-Making directory: /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/theme/template
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/css/theme/template/theme.scss -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/theme/template/theme.scss
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/css/theme/template/settings.scss -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/theme/template/settings.scss
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/css/theme/template/mixins.scss -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/theme/template/mixins.scss
-Making directory: /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/theme/source
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/css/theme/source/sky.scss -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/theme/source/sky.scss
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/css/theme/source/league.scss -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/theme/source/league.scss
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/css/theme/source/simple.scss -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/theme/source/simple.scss
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/css/theme/source/blood.scss -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/theme/source/blood.scss
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/css/theme/source/white.scss -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/theme/source/white.scss
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/css/theme/source/black.scss -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/theme/source/black.scss
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/css/theme/source/solarized.scss -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/theme/source/solarized.scss
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/css/theme/source/beige.scss -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/theme/source/beige.scss
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/css/theme/source/moon.scss -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/theme/source/moon.scss
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/css/theme/source/serif.scss -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/theme/source/serif.scss
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/css/theme/source/night.scss -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/theme/source/night.scss
-Making directory: /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/print
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/css/print/pdf.css -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/print/pdf.css
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/css/print/paper.css -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/css/print/paper.css
-Making directory: /opt/conda/share/jupyter/nbextensions/rise/reveal.js/plugin
-Making directory: /opt/conda/share/jupyter/nbextensions/rise/reveal.js/plugin/notes-server
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/plugin/notes-server/notes.html -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/plugin/notes-server/notes.html
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/plugin/notes-server/client.js -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/plugin/notes-server/client.js
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/plugin/notes-server/index.js -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/plugin/notes-server/index.js
-Making directory: /opt/conda/share/jupyter/nbextensions/rise/reveal.js/plugin/search
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/plugin/search/search.js -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/plugin/search/search.js
-Making directory: /opt/conda/share/jupyter/nbextensions/rise/reveal.js/plugin/multiplex
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/plugin/multiplex/client.js -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/plugin/multiplex/client.js
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/plugin/multiplex/index.js -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/plugin/multiplex/index.js
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/plugin/multiplex/master.js -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/plugin/multiplex/master.js
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/plugin/multiplex/package.json -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/plugin/multiplex/package.json
-Making directory: /opt/conda/share/jupyter/nbextensions/rise/reveal.js/plugin/notes
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/plugin/notes/notes.html -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/plugin/notes/notes.html
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/plugin/notes/notes.js -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/plugin/notes/notes.js
-Making directory: /opt/conda/share/jupyter/nbextensions/rise/reveal.js/plugin/math
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/plugin/math/math.js -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/plugin/math/math.js
-Making directory: /opt/conda/share/jupyter/nbextensions/rise/reveal.js/plugin/markdown
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/plugin/markdown/example.md -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/plugin/markdown/example.md
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/plugin/markdown/example.html -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/plugin/markdown/example.html
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/plugin/markdown/marked.js -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/plugin/markdown/marked.js
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/plugin/markdown/markdown.js -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/plugin/markdown/markdown.js
-Making directory: /opt/conda/share/jupyter/nbextensions/rise/reveal.js/plugin/print-pdf
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/plugin/print-pdf/print-pdf.js -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/plugin/print-pdf/print-pdf.js
-Making directory: /opt/conda/share/jupyter/nbextensions/rise/reveal.js/plugin/zoom-js
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/plugin/zoom-js/zoom.js -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/plugin/zoom-js/zoom.js
-Making directory: /opt/conda/share/jupyter/nbextensions/rise/reveal.js/plugin/highlight
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/plugin/highlight/highlight.js -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/plugin/highlight/highlight.js
-Making directory: /opt/conda/share/jupyter/nbextensions/rise/reveal.js/lib
-Making directory: /opt/conda/share/jupyter/nbextensions/rise/reveal.js/lib/font
-Making directory: /opt/conda/share/jupyter/nbextensions/rise/reveal.js/lib/font/league-gothic
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/lib/font/league-gothic/league-gothic.woff -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/lib/font/league-gothic/league-gothic.woff
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/lib/font/league-gothic/league-gothic.css -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/lib/font/league-gothic/league-gothic.css
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/lib/font/league-gothic/league-gothic.ttf -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/lib/font/league-gothic/league-gothic.ttf
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/lib/font/league-gothic/LICENSE -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/lib/font/league-gothic/LICENSE
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/lib/font/league-gothic/league-gothic.eot -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/lib/font/league-gothic/league-gothic.eot
-Making directory: /opt/conda/share/jupyter/nbextensions/rise/reveal.js/lib/font/source-sans-pro
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/lib/font/source-sans-pro/source-sans-pro-semibolditalic.ttf -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/lib/font/source-sans-pro/source-sans-pro-semibolditalic.ttf
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/lib/font/source-sans-pro/source-sans-pro-semibolditalic.eot -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/lib/font/source-sans-pro/source-sans-pro-semibolditalic.eot
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/lib/font/source-sans-pro/source-sans-pro-semibold.eot -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/lib/font/source-sans-pro/source-sans-pro-semibold.eot
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/lib/font/source-sans-pro/source-sans-pro-semibold.ttf -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/lib/font/source-sans-pro/source-sans-pro-semibold.ttf
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/lib/font/source-sans-pro/source-sans-pro-semibold.woff -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/lib/font/source-sans-pro/source-sans-pro-semibold.woff
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/lib/font/source-sans-pro/source-sans-pro-regular.ttf -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/lib/font/source-sans-pro/source-sans-pro-regular.ttf
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/lib/font/source-sans-pro/source-sans-pro-regular.eot -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/lib/font/source-sans-pro/source-sans-pro-regular.eot
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/lib/font/source-sans-pro/source-sans-pro-regular.woff -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/lib/font/source-sans-pro/source-sans-pro-regular.woff
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/lib/font/source-sans-pro/source-sans-pro-italic.ttf -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/lib/font/source-sans-pro/source-sans-pro-italic.ttf
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/lib/font/source-sans-pro/source-sans-pro-semibolditalic.woff -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/lib/font/source-sans-pro/source-sans-pro-semibolditalic.woff
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/lib/font/source-sans-pro/source-sans-pro-italic.eot -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/lib/font/source-sans-pro/source-sans-pro-italic.eot
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/lib/font/source-sans-pro/source-sans-pro.css -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/lib/font/source-sans-pro/source-sans-pro.css
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/lib/font/source-sans-pro/source-sans-pro-italic.woff -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/lib/font/source-sans-pro/source-sans-pro-italic.woff
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/lib/font/source-sans-pro/LICENSE -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/lib/font/source-sans-pro/LICENSE
-Making directory: /opt/conda/share/jupyter/nbextensions/rise/reveal.js/lib/css
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/lib/css/zenburn.css -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/lib/css/zenburn.css
-Making directory: /opt/conda/share/jupyter/nbextensions/rise/reveal.js/lib/js
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/lib/js/head.min.js -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/lib/js/head.min.js
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/lib/js/html5shiv.js -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/lib/js/html5shiv.js
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/lib/js/classList.js -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/lib/js/classList.js
-Making directory: /opt/conda/share/jupyter/nbextensions/rise/reveal.js/js
-Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/js/reveal.js -&gt; /opt/conda/share/jupyter/nbextensions/rise/reveal.js/js/reveal.js
-- Validating: <span class="ansi-green-fg">OK</span>
 
-    To initialize this nbextension in the browser every time the notebook (or other app) loads:
-    
-          jupyter nbextension enable rise --py --sys-prefix
-    
-</pre>
+
+<div class="output_text output_subarea output_execute_result">
+<pre>
+&lt;!DOCTYPE html&gt;
+
+&lt;html lang=&#34;ko&#34;&gt;
+&lt;head&gt;
+&lt;meta charset=&#34;utf-8&#34;&gt;
+&lt;meta content=&#34;width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes&#34; name=&#34;viewport&#34;/&gt;
+&lt;meta content=&#34;NOARCHIVE&#34; name=&#34;ROBOTS&#34;/&gt;
+&lt;meta content=&#34;IE=Edge&#34; http-equiv=&#34;X-UA-Compatible&#34;/&gt;
+&lt;!-- 추가수정본 180410
+&lt;meta http-equiv=&#34;Content-Type&#34; content=&#34;text/html; charset=utf-8&#34;/&gt;
+&lt;meta http-equiv=&#34;Cache-Control&#34; content=&#34;no-cache&#34;/&gt;
+&lt;meta http-equiv=&#34;Expires&#34; content=&#34;100&#34;/&gt;
+&lt;meta http-equiv=&#34;Pragma&#34; content=&#34;no-cache&#34;/&gt; --&gt;
+&lt;!-- 주인을 찾아요!(습득물) &gt; 습득물 목록 조회 - 경찰청 유실물 종합관리시스템 --&gt;
+&lt;title&gt;
+ 
+	주인을 찾아요!(습득물) &amp;gt; 습득물 목록 조회 | 경찰청 유실물 종합관리시스템
+	
+
+&lt;/title&gt;
+&lt;!-- Chrome, Safari, IE --&gt;
+&lt;link href=&#34;/favicon.ico?v=2&#34; rel=&#34;shortcut icon&#34; type=&#34;image/x-icon&#34;/&gt;
+&lt;link href=&#34;/favicon.ico?v=2&#34; rel=&#34;icon&#34; type=&#34;image/x-icon&#34;/&gt;
+&lt;!-- Firefox, Opera (Chrome and Safari say thanks but no thanks)  --&gt;
+&lt;link href=&#34;/images/home/common/favicon.ico?v=2&#34; rel=&#34;icon&#34;/&gt;
+&lt;link href=&#34;/images/home/common/favicon-16.png&#34; rel=&#34;icon&#34; sizes=&#34;16x16&#34;/&gt;
+&lt;link href=&#34;/images/home/common/favicon-32.png&#34; rel=&#34;icon&#34; sizes=&#34;32x32&#34;/&gt;
+&lt;!-- HOME_NEW 디자인 적용 사용 S--&gt;
+&lt;link href=&#34;/css/home/style.css&#34; media=&#34;screen&#34; rel=&#34;stylesheet&#34;/&gt;
+&lt;!-- &lt;link href=&#34;/css/home/home_common.css&#34; rel=&#34;stylesheet&#34; type=&#34;text/css&#34; /&gt; --&gt;
+&lt;!-- &lt;link href=&#34;/css/home/home_main.css&#34; rel=&#34;stylesheet&#34; type=&#34;text/css&#34; /&gt; --&gt;
+&lt;!-- &lt;link href=&#34;/css/home/home_sub.css&#34; rel=&#34;stylesheet&#34; type=&#34;text/css&#34; /&gt;  --&gt;
+&lt;!-- &lt;link href=&#34;/css/home/home_MetroJs.css&#34; rel=&#34;stylesheet&#34; type=&#34;text/css&#34; /&gt;  --&gt;
+&lt;!-- 퀵메뉴참조 --&gt;
+&lt;!-- LOST112_CDH 신규추가 다음주소API--&gt;
+&lt;script src=&#34;https://spi.maps.daum.net/imap/map_js_init/postcode.v2.js&#34;&gt;&lt;/script&gt;
+&lt;!--[if lt IE 9]&gt;
+&lt;script src=&#34;//html5shiv.googlecode.com/svn/trunk/html5.js&#34;&gt;&lt;/script&gt;
+&lt;![endif]&gt;
+&lt;!--[if lt IE 9]&gt;
+&lt;script src=&#34;http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE9.js&#34;&gt;&lt;/script&gt;
+&lt;![endif]&gt;
+&lt;!--[if lt IE 8]&gt;
+&lt;script src=&#34;http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE8.js&#34;&gt;&lt;/script&gt;
+&lt;![endif]&gt;
+&lt;!--[if lt IE 7]&gt;
+&lt;script src=&#34;http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE7.js&#34;&gt;&lt;/script&gt;
+&lt;![endif]--&gt;
+&lt;script&gt;
+	//ie8이하에서 html5 태그가 허용되도록 변경
+	document.createElement(&#39;header&#39;);
+	document.createElement(&#39;nav&#39;);
+	document.createElement(&#39;article&#39;);
+	document.createElement(&#39;section&#39;);
+	document.createElement(&#39;aside&#39;);
+	document.createElement(&#39;footer&#39;);
+&lt;/script&gt;
+&lt;script src=&#34;/js/jquery-1.7.1.min.js&#34; type=&#34;text/javascript&#34;&gt;&lt;/script&gt;
+&lt;!-- HOME_NEW 디자인 적용 사용 E--&gt;
+&lt;script src=&#34;/js/jquery-1.9.0.min.js&#34; type=&#34;text/javascript&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;/js/jquery-latest.js&#34; type=&#34;text/javascript&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;/js/lost112.js&#34; type=&#34;text/javascript&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;/include/policeHelper.js&#34; type=&#34;text/javascript&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;/include/EgovMultiFile.js&#34; type=&#34;text/javascript&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;/js/common.js&#34; type=&#34;text/javascript&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;/include/policeOnloader.js&#34; type=&#34;text/javascript&#34;&gt;&lt;/script&gt;
+&lt;meta content=&#34;text/html; charset=utf-8&#34; http-equiv=&#34;Content-Type&#34;/&gt;
+&lt;script src=&#34;/js/jquery.carouFredSel-5.5.0-packed.js&#34; type=&#34;text/javascript&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;/js/home/ui.js&#34; type=&#34;text/javascript&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;/js/home/calendar.js&#34; type=&#34;text/javascript&#34;&gt;&lt;/script&gt;
+&lt;!-- 색상 --&gt;
+&lt;script src=&#34;/js/color/iColorPicker.js&#34; type=&#34;text/javascript&#34;&gt;&lt;/script&gt;&lt;!-- 2016-01-14추가 --&gt;
+&lt;!-- 로딩바spin--&gt;
+&lt;script src=&#34;/js/spin.js&#34; type=&#34;text/javascript&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;/js/spin.min.js&#34; type=&#34;text/javascript&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;/js/jquery.spin.js&#34; type=&#34;text/javascript&#34;&gt;&lt;/script&gt;
+&lt;!-- 그래픽 화면--&gt;
+&lt;script src=&#34;/js/amcharts/amcharts.js&#34; type=&#34;text/javascript&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;/js/amcharts/pie.js&#34; type=&#34;text/javascript&#34;&gt;&lt;/script&gt;
+&lt;!-- 화면 확대 축소 화면--&gt;
+&lt;script src=&#34;/js/accessible.js&#34; type=&#34;text/javascript&#34;&gt;&lt;/script&gt;
+&lt;!-- HOME_NEW 디자인 적용 사용 S--&gt;
+&lt;script src=&#34;/js/MetroJs/bundles/home_MetroJs.lt.js&#34; type=&#34;text/javascript&#34;&gt;&lt;/script&gt;
+&lt;script type=&#34;text/javascript&#34;&gt;
+	$(document).ready(function() {
+		$(&#34;.live-tile,.flip-list&#34;).liveTile();
+	});
+&lt;/script&gt;
+&lt;style type=&#34;text/css&#34;&gt;
+	@import url(https://fonts.googleapis.com/earlyaccess/jejugothic.css);
+	@import url(https://fonts.googleapis.com/earlyaccess/jejuhallasan.css);
+	.jg {font-family: &#39;Jeju Gothic&#39;;}
+	.jh {font-family: &#39;Jeju Hallasan&#39;;}
+&lt;/style&gt;
+&lt;!-- HOME_NEW 디자인 적용 사용 E--&gt;
+&lt;script type=&#34;text/javascript&#34;&gt;
+  &lt;!--
+  function setCookie( name, value, expiredays ) { 
+   var todayDate = new Date(); 
+    todayDate.setDate( todayDate.getDate() + expiredays ); 
+    document.cookie = name + &#34;=&#34; + escape( value ) + &#34;; path=/; expires=&#34; + todayDate.toGMTString() + &#34;;&#34; 
+   }
+  function closePop() { 
+   if ( document.pop_form.chkbox.checked ){ 
+    setCookie( &#34;maindiv&#34;, &#34;done&#34; , 1 ); 
+   } 
+   document.all[&#39;pop&#39;].style.visibility = &#34;hidden&#34;;
+  }
+  //--&gt;  
+&lt;/script&gt;
+&lt;script type=&#34;text/javascript&#34;&gt;
+//&lt;![CDATA[
+	/*
+	SELECT의 OPTION을 조회한다.
+		@param id - SELECT객체의 ID
+		@param code - 조회시 필요한 parameter
+		@param menuId - SQL관련 KEY
+		@param defaultValue - 조회 후 기본 선택값
+	*/
+	function fnSelect(id, code, menuId, defaultValue) {
+		
+		url = &#34;/ajaxCodeSelect.do&#34;;
+		data = &#34;ajaxParam1=&#34;+code+&#34;&amp;menuId=&#34;+menuId;
+		ajaxSelect(url, data, id, defaultValue, &#39;select&#39;);
+	}
+	function fnSelectNew(id, code, menuId, defaultValue) {
+		url = &#34;/ajaxCodeSelect.do&#34;;
+		data = &#34;menuId=&#34;+menuId+&#34;&amp;&#34;+code;
+		ajaxSelect(url, data, id, defaultValue, &#39;select&#39;);
+	}
+	function fnPage(id, code, menuId, preHtml) {
+		url = &#34;/ajaxPage.do&#34;;
+		data = &#34;ajaxParam1=&#34;+code+&#34;&amp;menuId=&#34;+menuId;
+		ajaxPage(url, data, id, preHtml);
+	}
+	function fnValue(id, code, menuId, preHtml) {
+		url = &#34;/ajaxPage.do&#34;;
+		data = &#34;ajaxParam1=&#34;+code+&#34;&amp;menuId=&#34;+menuId;
+		ajaxValue(url, data, id, preHtml);
+	}
+	function fnValues(id, code1, code2, menuId, preHtml) {
+		url = &#34;/ajaxPages.do&#34;;
+		data = &#34;ajaxParam1=&#34;+code1+&#34;&amp;ajaxParam2=&#34;+code2+&#34;&amp;menuId=&#34;+menuId;
+		ajaxValues(url, data, id, preHtml,true);
+	}
+
+/* 	호출하는 .jsp파일에게 불린다.
+ 	파라미터 받아서 ajaxLayer.do 컨트롤러를 호출하고 
+ 	ajaxCodeLayer 에 접근한다.
+ 	2014.08.26 YMYOON					*/
+	
+	function fnLayer(id, code, menuId, defaultValue){
+		url = &#34;/ajaxLayer.do&#34;;
+		data = &#34;ajaxParam1=&#34;+code+&#34;&amp;menuId=&#34;+menuId+&#34;&amp;gubun=&#34;+defaultValue;
+		ajaxCodeLayer(url, data, id, defaultValue);		
+	}
+	
+ 	
+//  	function fnLayer(id, code, menuId, defaultValue, layerNum){
+// 		url = &#34;/ajaxLayer.do&#34;;
+// 		data = &#34;ajaxParam1=&#34;+code+&#34;&amp;menuId=&#34;+menuId+&#34;&amp;layerNum=&#34;+layerNum;
+// 		ajaxCodeLayer(url, data, id, defaultValue);	
+// 	}
+ 	
+ 	function fnBanner(id, sqlKey, defaultValue) {
+		url = &#34;/ajaxBanner.do&#34;;
+		data = &#34;sqlKey=&#34;+sqlKey;
+		ajaxBanner(url, data, id, defaultValue);	
+ 	}
+
+//  	fnPopup원본
+//  	function fnPopup(id, code, menuId, defaultValue){
+// 		url = &#34;/popup.do&#34;; 
+// 		data = &#34;&amp;POPUP_ID=&#34;+menuId;
+// 		ajaxPopupLayer(url, data, id, defaultValue);		
+// 	}
+ 	
+ 	function fnPopup(){
+// 		url = &#34;/popup.do&#34;; 
+// 		data = &#34;&amp;POPUP_ID=&#34;+menuId;
+// 		ajaxPopupLayer(url, data, id, defaultValue);		
+	}
+ 	
+ 	function fnDate(strDateObj,endDateObj){
+ 		var strDate = strDateObj.val();
+ 		var endDate = endDateObj.val();
+ 		var str = strDate.replace(/\s/g,&#39;&#39;);
+ 		var end = endDate.replace(/\s/g,&#39;&#39;);
+
+ 		bRtn = true;
+		 if((str == strDate)&amp;&amp;(end == endDate)){
+			if( (strDate != &#34;&#34; &amp;&amp; strDate != null )||(endDate != &#34;&#34; &amp;&amp; endDate != null) ) {
+		 		if(strDate.length != &#39;8&#39; || endDate.length != &#39;8&#39;){
+					if (strDate.length != &#39;8&#39;){
+						bRtn = false;
+						alert(&#34;검색 시작일을 선택하여 주십시오. \n ex) 20151011&#34;);
+						strDateObj.focus();
+					} else if (endDate.length != &#39;8&#39;){
+						bRtn = false;
+				 		alert(&#34;검색 종료일을 선택하여 주십시오. \n ex) 20151011&#34;);
+						endDateObj.focus();
+					}
+				}else if(strDate&gt;endDate){
+		 			alert(&#34;시작일이 종료일보다 클 수 없습니다.&#34;);
+		 			strDateObj.focus();
+		 			bRtn = false;
+				}
+		 	}else{
+		 		if (strDate == &#34;&#34; || strDate == null ){
+			 		bRtn = false;
+			 		alert(&#34;검색 시작일을 선택하여 주십시오. \n ex) 20151011&#34;);
+		 			strDateObj.focus();
+		 		}else if (endDate == &#34;&#34; || endDate == null){
+			 		bRtn = false;
+			 		alert(&#34;검색 종료일을 선택하여 주십시오. \n ex) 20151011&#34;);
+					endDateObj.focus();
+				}
+		 	}
+		 }else{
+			alert(&#34;기간을 선택하여 주십시오. \n ex) 20151012&#34;);
+			strDateObj.focus();
+			bRtn = false;
+		 }
+		return bRtn;
+ 	}
+ 	
+ 	
+ 	// 색상코드 --------------------------------------------------------------------------------------------------------------------------------------------------
+	var colorIdArr = [
+			&#39;CL1012&#39;,&#39;CL1013&#39;,&#39;CL1014&#39;,&#39;CL1015&#39;,&#39;CL1016&#39;,&#39;CL1017&#39;,&#39;CL1018&#39;,&#39;CL1019&#39;,&#39;CL1020&#39;,&#39;CL1021&#39;,&#39;CL1022&#39;,&#39;CL1023&#39;,&#39;CL1024&#39;,&#39;CL1025&#39;,&#39;CL1026&#39;,&#39;CL1027&#39;,
+			&#39;CL1028&#39;,&#39;CL1029&#39;,&#39;CL1030&#39;,&#39;CL1031&#39;,&#39;CL1032&#39;,&#39;CL1033&#39;,&#39;CL1034&#39;,&#39;CL1035&#39;,&#39;CL1036&#39;,&#39;CL1037&#39;,&#39;CL1038&#39;,&#39;CL1039&#39;,&#39;CL1040&#39;,&#39;CL1041&#39;,&#39;CL1042&#39;,&#39;CL1043&#39;,
+			&#39;CL1044&#39;,&#39;CL1045&#39;,&#39;CL1046&#39;,&#39;CL1047&#39;,&#39;CL1048&#39;,&#39;CL1049&#39;,&#39;CL1050&#39;,&#39;CL1051&#39;,&#39;CL1052&#39;,&#39;CL1053&#39;,&#39;CL1054&#39;,&#39;CL1055&#39;,&#39;CL1056&#39;,&#39;CL1057&#39;,&#39;CL1058&#39;,&#39;CL1059&#39;,
+			&#39;CL1060&#39;,&#39;CL1061&#39;,&#39;CL1062&#39;,&#39;CL1063&#39;,&#39;CL1064&#39;,&#39;CL1065&#39;,&#39;CL1066&#39;,&#39;CL1067&#39;,&#39;CL1068&#39;,&#39;CL1069&#39;,&#39;CL1070&#39;,&#39;CL1071&#39;,&#39;CL1072&#39;,&#39;CL1073&#39;,&#39;CL1074&#39;,&#39;CL1075&#39;,
+			&#39;CL1076&#39;,&#39;CL1077&#39;,&#39;CL1078&#39;,&#39;CL1079&#39;,&#39;CL1080&#39;,&#39;CL1081&#39;,&#39;CL1082&#39;,&#39;CL1083&#39;,&#39;CL1084&#39;,&#39;CL1085&#39;,&#39;CL1086&#39;,&#39;CL1087&#39;,&#39;CL1088&#39;,&#39;CL1089&#39;,&#39;CL1090&#39;,&#39;CL1091&#39;,
+			&#39;CL1092&#39;,&#39;CL1093&#39;,&#39;CL1094&#39;,&#39;CL1095&#39;,&#39;CL1096&#39;,&#39;CL1097&#39;,&#39;CL1098&#39;,&#39;CL1099&#39;,&#39;CL1100&#39;,&#39;CL1101&#39;,&#39;CL1102&#39;,&#39;CL1103&#39;,&#39;CL1104&#39;,&#39;CL1105&#39;,&#39;CL1106&#39;,&#39;CL1107&#39;,
+			&#39;CL1108&#39;,&#39;CL1109&#39;,&#39;CL1110&#39;,&#39;CL1111&#39;,&#39;CL1112&#39;,&#39;CL1113&#39;,&#39;CL1114&#39;,&#39;CL1115&#39;,&#39;CL1116&#39;,&#39;CL1117&#39;,&#39;CL1118&#39;,&#39;CL1119&#39;,&#39;CL1120&#39;,&#39;CL1121&#39;,&#39;CL1122&#39;,&#39;CL1123&#39;,
+			&#39;CL1001&#39;,&#39;CL1002&#39;,&#39;CL1003&#39;,&#39;CL1004&#39;,&#39;CL1005&#39;,&#39;CL1006&#39;,&#39;CL1007&#39;,&#39;CL1008&#39;,&#39;CL1009&#39;,&#39;CL1011&#39;,&#39;CL1010&#39;
+	];
+ 	
+ 	var hexIdArr = [
+			&#39;f00&#39;, &#39;ff0&#39;, &#39;0f0&#39;, &#39;0ff&#39;, &#39;00f&#39;, &#39;f0f&#39;, &#39;fff&#39;, &#39;ebebeb&#39;, &#39;e1e1e1&#39;, &#39;d7d7d7&#39;, &#39;ccc&#39;, &#39;c2c2c2&#39;, &#39;b7b7b7&#39;, &#39;acacac&#39;, &#39;a0a0a0&#39;, &#39;959595&#39;, 
+		    &#39;ee1d24&#39;, &#39;fff100&#39;, &#39;00a650&#39;, &#39;00aeef&#39;, &#39;2f3192&#39;, &#39;ed008c&#39;, &#39;898989&#39;, &#39;7d7d7d&#39;, &#39;707070&#39;, &#39;626262&#39;, &#39;555&#39;, &#39;464646&#39;, &#39;363636&#39;, &#39;262626&#39;, &#39;111&#39;, &#39;000&#39;,
+		    &#39;f7977a&#39;, &#39;fbad82&#39;, &#39;fdc68c&#39;, &#39;fff799&#39;, &#39;c6df9c&#39;, &#39;a4d49d&#39;, &#39;81ca9d&#39;, &#39;7bcdc9&#39;, &#39;6ccff7&#39;, &#39;7ca6d8&#39;, &#39;8293ca&#39;, &#39;8881be&#39;, &#39;a286bd&#39;, &#39;bc8cbf&#39;, &#39;f49bc1&#39;, &#39;f5999d&#39;,
+		    &#39;f16c4d&#39;, &#39;f68e54&#39;, &#39;fbaf5a&#39;, &#39;fff467&#39;, &#39;acd372&#39;, &#39;7dc473&#39;, &#39;39b778&#39;, &#39;16bcb4&#39;, &#39;00bff3&#39;, &#39;438ccb&#39;, &#39;5573b7&#39;, &#39;5e5ca7&#39;, &#39;855fa8&#39;, &#39;a763a9&#39;, &#39;ef6ea8&#39;, &#39;f16d7e&#39;,
+		    &#39;ee1d24&#39;, &#39;f16522&#39;, &#39;f7941d&#39;, &#39;fff100&#39;, &#39;8fc63d&#39;, &#39;37b44a&#39;, &#39;00a650&#39;, &#39;00a99e&#39;, &#39;00aeef&#39;, &#39;0072bc&#39;, &#39;0054a5&#39;, &#39;2f3192&#39;, &#39;652c91&#39;, &#39;91278f&#39;, &#39;ed008c&#39;, &#39;ee105a&#39;,
+		    &#39;9d0a0f&#39;, &#39;a1410d&#39;, &#39;a36209&#39;, &#39;aba000&#39;, &#39;588528&#39;, &#39;197b30&#39;, &#39;007236&#39;, &#39;00736a&#39;, &#39;0076a4&#39;, &#39;004a80&#39;, &#39;003370&#39;, &#39;1d1363&#39;, &#39;450e61&#39;, &#39;62055f&#39;, &#39;9e005c&#39;, &#39;9d0039&#39;,
+		    &#39;790000&#39;, &#39;7b3000&#39;, &#39;7c4900&#39;, &#39;827a00&#39;, &#39;3e6617&#39;, &#39;045f20&#39;, &#39;005824&#39;, &#39;005951&#39;, &#39;005b7e&#39;, &#39;003562&#39;, &#39;002056&#39;, &#39;0c004b&#39;, &#39;30004a&#39;, &#39;4b0048&#39;, &#39;7a0045&#39;, &#39;7a0026&#39;,
+		    &#39;fff&#39;,&#39;000&#39;,&#39;f00&#39;,&#39;ff8000&#39;,&#39;ff0&#39;,&#39;0f0&#39;,&#39;00f&#39;,&#39;a52a2a&#39;,&#39;ee82ee&#39;,&#39;ffc0cb&#39;,&#39;fff&#39;
+	];
+
+	var colorNmArr = [
+			&#39;레드(빨강)&#39;,&#39;엘로우(노랑)&#39;,&#39;그린(초록)&#39;,&#39;터키오이스(옥)&#39;,&#39;블루(파랑)&#39;,&#39;마젠타(자홍)&#39;,&#39;화이트(흰)&#39;,&#39;그레이(회)&#39;,&#39;그레이(회)&#39;,&#39;라이트그레이(옅은회)&#39;,&#39;그레이(회)&#39;,&#39;실버(은)&#39;,&#39;그레이(회)&#39;,&#39;그레이(암회)&#39;,&#39;그레이(회)&#39;,&#39;그레이(회)&#39;,
+			&#39;알리자린(홍)&#39;,&#39;엘로우(노랑)&#39;,&#39;그린(초록)&#39;,&#39;시안(청록)&#39;,&#39;블루(파랑)&#39;,&#39;핑크(분홍)&#39;,&#39;그레이(회)&#39;,&#39;그레이(회)&#39;,&#39;그레이(회)&#39;,&#39;그레이(회)&#39;,&#39;그레이(회)&#39;,&#39;그레이(회)&#39;,&#39;그레이(회)&#39;,&#39;그레이(회)&#39;,&#39;그레이(회)&#39;,&#39;블랙(검정)&#39;,
+			&#39;코럴(산호)&#39;,&#39;코럴(산호)&#39;,&#39;피치오렌지(오렌지)&#39;,&#39;엘로우(밝은노랑)&#39;,&#39;라임(라임)&#39;,&#39;네온그린(형광초록)&#39;,&#39;씨그린(노르스름한녹)&#39;,&#39;시안(청록)&#39;,&#39;딥스카이블루(새파란하늘)&#39;,&#39;코발트(짙은청록)&#39;,&#39;로열블루(밝은남)&#39;,&#39;블루(파랑)&#39;,&#39;바이올렛(보라)&#39;,&#39;퓨시아(자홍)&#39;,&#39;핑크(연한핑크)&#39;,&#39;레드(연한레드)&#39;,
+			&#39;코럴(산호)&#39;,&#39;코럴(산호)&#39;,&#39;오렌지(연한오렌지)&#39;,&#39;엘로우(밝은노랑)&#39;,&#39;샤르트뢰즈(역녹)&#39;,&#39;그린(초록)&#39;,&#39;씨그린(노르스름한녹)&#39;,&#39;스트롱시안(진한청록)&#39;,&#39;딥스카이블루(새파란하늘)&#39;,&#39;코발트(밝은남)&#39;,&#39;로열블루(밝은남)&#39;,&#39;블루(어두운파랑)&#39;,&#39;바이올렛(보라)&#39;,&#39;퓨시아(자홍)&#39;,&#39;핑크(연한핑크)&#39;,&#39;레드(연한빨강)&#39;,
+			&#39;알리자린(홍)&#39;,&#39;코럴(산호)&#39;,&#39;오렌지(선명한오렌지)&#39;,&#39;엘로우(노랑)&#39;,&#39;샤르트뢰즈(역녹)&#39;,&#39;에메랄드(선녹)&#39;,&#39;그린(초록)&#39;,&#39;다크시안(어두운청록)&#39;,&#39;딥스카이블루(새파란하늘)&#39;,&#39;코발트(짙은청록)&#39;,&#39;코발트(짙은청록)&#39;,&#39;블루(파랑)&#39;,&#39;바이올렛(보라)&#39;,&#39;퓨시아(자홍)&#39;,&#39;핑크(분홍)&#39;,&#39;핑크(선명한분홍)&#39;,
+			&#39;다크레드(진빨강)&#39;,&#39;코럴(산호)&#39;,&#39;다크오렌지(어두운오렌지)&#39;,&#39;올리브(녹갈)&#39;,&#39;샤르트뢰즈(역녹)&#39;,&#39;에메랄드(선녹)&#39;,&#39;라임그린(어두운청록)&#39;,&#39;다크시안(어두운청록)&#39;,&#39;다크블루(어두운파랑)&#39;,&#39;코발트(짙은청록)&#39;,&#39;코발트(짙은청록)&#39;,&#39;블루바이올렛(남보라)&#39;,&#39;다크바이올렛(진보라)&#39;,&#39;퓨시아(자홍)&#39;,&#39;다크핑크(진분홍)&#39;,&#39;다크핑크(진분홍)&#39;,
+			&#39;다크레드(진빨강)&#39;,&#39;브라운(갈)&#39;,&#39;브라운(갈)&#39;,&#39;올리브(녹갈)&#39;,&#39;샤르트뢰즈(역녹)&#39;,&#39;에메랄드(선녹)&#39;,&#39;라임그린(어두운청록)&#39;,&#39;다크시안(어두운청록)&#39;,&#39;다크블루(어두운파랑)&#39;,&#39;코발트(짙은청록)&#39;,&#39;로열블루(밝은남)&#39;,&#39;블루바이올렛(남보라)&#39;,&#39;다크바이올렛(진보라)&#39;,&#39;퓨시아(자홍)&#39;,&#39;다크핑크(진분홍)&#39;,&#39;다크레드(진빨강)&#39;,
+			&#39;화이트(흰)&#39;,&#39;블랙(검정)&#39;,&#39;레드(빨강)&#39;,&#39;오렌지(주황)&#39;,&#39;엘로우(노랑)&#39;,&#39;그린(초록)&#39;,&#39;블루(파랑)&#39;,&#39;브라운(갈)&#39;,&#39;바이올렛(보라)&#39;,&#39;핑크(분홍)&#39;,&#39;기타&#39;
+	];
+	
+	// 배열에서 해당 idx 구하기
+	function in_array(val, arr){
+ 		for(i=0; i&lt;arr.length; i++){
+ 			if(arr[i] == val){
+ 		    	return i;
+ 		   	}
+		}
+ 		return -1;
+	}
+		    
+ 	// 색상 코드값으로 색상이름 구하기
+ 	function fn_color_nm1(colorId){
+		var colorId = colorId.substr(1, colorId.length-1);
+		var idx = in_array(colorId, hexIdArr);
+ 		$( &#34;#CLR_NM&#34; ).val(colorNmArr[idx]);	// 색상이름값 셋팅
+ 		$( &#34;#CLR_CD&#34; ).val(colorIdArr[idx]);		// 색상코드값 셋팅
+ 	}
+ 	
+ 	// 색상 코드값으로 색상이름 구하기
+ 	function fn_color_nm2(colorId, name, type){
+		var idx = in_array(colorId, colorIdArr);
+		
+		if(type == &#39;update&#39;){ // 수정을 클릭했을 경우
+			$( &#34;#&#34;+name).val(colorNmArr[idx]);
+			$(&#34;#CLR_CD&#34;).val(colorId);
+			$(&#34;#CLR_HEX_CD&#34;).val(&#34;#&#34;+hexIdArr[idx]);
+			$(&#34;#CLR_HEX_CD&#34;).css(&#34;background-color&#34;,&#34;#&#34;+hexIdArr[idx]);
+		} else{ // 상세화면일 경우
+ 			$( &#34;#&#34;+name).html(colorNmArr[idx]);
+ 			$(&#34;#CLR_CD&#34;).val(colorId);
+ 			$(&#34;#CLR_HEX_CD&#34;).val(&#34;#&#34;+hexIdArr[idx]);
+			$(&#34;#CLR_HEX_CD&#34;).css(&#34;background-color&#34;,&#34;#&#34;+hexIdArr[idx]);
+			$(&#34;#icp_CLR_HEX_CD&#34;).remove();
+			
+		}
+ 	}
+// ]]&gt; 
+
+ // LOST112_CDH(20170613) 주소검색 버튼 클릭 다음API를 이용한 주소검색
+	function fnDaumAddrApi(zp_cd, addr, addr_dtl){
+		new daum.Postcode({
+	        oncomplete: function(data) {
+	            // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+	
+	            // 각 주소의 노출 규칙에 따라 주소를 조합한다.
+	            // 내려오는 변수가 값이 없는 경우엔 공백(&#39;&#39;)값을 가지므로, 이를 참고하여 분기 한다.
+	            var fullAddr = &#39;&#39;; // 최종 주소 변수
+	            var extraAddr = &#39;&#39;; // 조합형 주소 변수
+	            // 사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
+	            if (data.userSelectedType === &#39;R&#39;) { // 사용자가 도로명 주소를 선택했을 경우
+	                fullAddr = data.roadAddress;
+	
+	            } else { // 사용자가 지번 주소를 선택했을 경우(J)
+	                fullAddr = data.jibunAddress;
+	            }
+	
+	            // 사용자가 선택한 주소가 도로명 타입일때 조합한다.
+	            if(data.userSelectedType === &#39;R&#39;){
+	                //법정동명이 있을 경우 추가한다.
+	                if(data.bname !== &#39;&#39;){
+	                    extraAddr += data.bname;
+	                }
+	                // 건물명이 있을 경우 추가한다.
+	                if(data.buildingName !== &#39;&#39;){
+	                    extraAddr += (extraAddr !== &#39;&#39; ? &#39;, &#39; + data.buildingName : data.buildingName);
+	                }
+	                // 조합형주소의 유무에 따라 양쪽에 괄호를 추가하여 최종 주소를 만든다.
+	                fullAddr += (extraAddr !== &#39;&#39; ? &#39; (&#39;+ extraAddr +&#39;)&#39; : &#39;&#39;);
+	            }
+	
+	            // 우편번호와 주소 정보를 해당 필드에 넣는다.
+	            document.getElementById(zp_cd).value = data.zonecode; //5자리 새우편번호 사용
+	            document.getElementById(addr).value = fullAddr;
+	
+	            // 커서를 상세주소 필드로 이동한다.
+	            document.getElementById(addr_dtl).focus();
+	        }
+	    }).open();
+	}
+ 
+&lt;/script&gt;
+&lt;!-- flush=&#34;true&#34; --&gt;
+&lt;/meta&gt;&lt;/head&gt;
+&lt;body id=&#34;none&#34;&gt;
+&lt;div id=&#34;wrap&#34;&gt;
+&lt;!--// Header --&gt;
+&lt;style&gt;
+.uin_focus {border: 3px solid red;}
+.uout_focus {border: 0px;}
+&lt;/style&gt;
+&lt;!--[if lte IE 8]&gt;
+&lt;p&gt;
+    사용하고 계신 브라우저는 Internet Explore 8 이하입니다.&lt;br /&gt;
+    &lt;strong&gt;경찰청 유실물 종합관리 시스템 홈페이지는 Internet Explore 9 이상에서 최적화 되어 있습니다.&lt;/strong&gt; 웹 브라우저를 &lt;a href=&#34;http://www.microsoft.com/korea/ie&#34;&gt;업그레이드&lt;/a&gt; 해 보세요.&lt;br /&gt;
+    다른 최신 브라우저를 사용해 보셔도 좋습니다!
+    &lt;a href=&#34;http://www.mozilla.or.kr/ko/Firefox/&#34;&gt;fireFox&lt;/a&gt;,
+    &lt;a href=&#34;http://kr.opera.com/download/&#34;&gt;opera&lt;/a&gt;,
+    &lt;a href=&#34;http://www.apple.com/kr/safari/&#34;&gt;Safari&lt;/a&gt;,
+    &lt;a href=&#34;http://www.google.com/chrome?hl=ko&#34;&gt;chrome&lt;/a&gt;
+&lt;/p&gt;
+&lt;![endif]--&gt;
+&lt;noscript&gt;스크립트가 지원되지 않는 환경입니다. 일부기능이 작동안될 수 있습니다.&lt;/noscript&gt;
+&lt;input id=&#34;rootUrl&#34; type=&#34;hidden&#34; value=&#34;&#34;/&gt;
+&lt;script type=&#34;text/javascript&#34;&gt;
+//&lt;![CDATA[
+           
+var selectedMainMenuNo = &#34;&#34;;
+var selectedSubMenuNo = &#34;&#34;;
+
+	$(document).ready(function(){
+		
+// 		if($(&#34;#totalSearch&#34;).val() != &#34;&#34;){
+// 			$(&#34;#totalSearch&#34;).addClass(&#34;focusnot&#34;);
+// 		}else{
+// 			$(&#34;#totalSearch&#34;).removeClass(&#34;focusnot&#34;);
+// 		}
+		
+		$(&#34;#totalSearch&#34;).keydown(function(){ 
+			if(event.keyCode == 13){				
+				$(&#39;#mainSearch&#39;).click();
+			}  
+		});
+
+
+		$(&#39;#mainSearch&#39;).click(function(){
+			//$(&#39;#loading&#39;).fadeIn(150);
+// 			$(&#39;#loading_spin&#39;).spin(&#39;large&#39;,&#39;gray&#39;);
+// 			document.frmMainTopSearch.action = &#34;/searchIndex.do&#34;;
+			document.frmMainTopSearch.action = &#34;/lost/toTalSearch.do&#34;;			
+		   	document.frmMainTopSearch.submit();
+		});
+
+// 		$(&#39;#go_language&#39;).click(function(){
+// 			if($(&#39;#sl_language&#39;).val() == &#39;English&#39;){
+// 				fn_manyLanguages(&#39;English&#39;);
+// 			}else if($(&#39;#sl_language&#39;).val() == &#39;Japanese&#39;){
+// 				fn_manyLanguages(&#39;Japanese&#39;);
+// 			}else if($(&#39;#sl_language&#39;).val() == &#39;Chinese&#39;){
+// 				fn_manyLanguages(&#39;Chinese&#39;);
+// 			}
+// 		});
+		
+		$(&#39;button.go_select&#39;).click(function(){
+			var fUrl = $(this).parent().find(&#39;select option:selected&#39;).val();
+			window.open(fUrl,&#39;_blank&#39;);
+		});
+		
+	});
+	
+
+	/*다국어 사이트 바로가기 Controller로 변경(다국어 사이트 접속 카운트 위해) */
+	function fn_manyLanguages(target){
+		if(target == &#39;English&#39;){
+			window.open(&#34;/manyLanguage.do?langType=en&#34;);
+		}else if(target == &#39;Japanese&#39;){
+			window.open(&#34;/manyLanguage.do?langType=jp&#34;);
+		}else if(target == &#39;Chinese&#39;){
+			window.open(&#34;/manyLanguage.do?langType=ch&#34;);
+		}
+		
+	}
+
+
+	$(&#39;#btn&#39;).click(function(){
+		$add(document.commandMap, &#39;IN_RES_NO&#39;, $(&#39;#RES_NO1&#39;).val()+$(&#39;#RES_NO2&#39;).val());
+		tform = document.commandMap;
+		window.open(&#34;&#34;,&#34;new_popup1&#34;,&#34;height=700,width=900,scrollbars=yes&#34;);
+		tform.target = &#34;new_popup1&#34;;
+		tform.action = &#34;/reportProc.do?REPORT_ID=lostProcRpt&#34;;
+		tform.method = &#34;post&#34;;
+		tform.submit();
+
+		tform.target = &#34;&#34;;
+	});
+
+
+	function fn_login(val){
+		if(val==&#34;Y&#34;){
+			var resNoYn = &#34;&#34;;
+			if(resNoYn == &#34;&#34; || resNoYn == null){
+				window.location = &#34;/html.do;jsessionid=zfZUKGE3RyFAVs0YQ0Poa30PEJI1GC45dacJvYO318DuaC910jn0a3ASTEv1WNqp.found02_servlet_www?html=/lost/firstNameCheck&amp;sub=LS&amp;title=분실물&amp;ptitle=실명인증&#34;;
+			}else{
+				window.location = &#34;/html.do;jsessionid=zfZUKGE3RyFAVs0YQ0Poa30PEJI1GC45dacJvYO318DuaC910jn0a3ASTEv1WNqp.found02_servlet_www?html=/lost/addLostView&amp;sub=LS&amp;title=분실물&amp;ptitle=분실물신고&#34;;
+			}
+		}else{
+			alert(&#34;로그인이 필요한 페이지입니다.&#34;);
+			window.location = &#34;/html.do;jsessionid=zfZUKGE3RyFAVs0YQ0Poa30PEJI1GC45dacJvYO318DuaC910jn0a3ASTEv1WNqp.found02_servlet_www?html=/member/login&amp;sub=U&amp;title=회원마당&amp;ptitle=로그인&#34;;
+		}
+	}
+
+	function fn_loginMyPage(val){
+		if(val==&#34;Y&#34;){
+			window.location = &#34;/html.do;jsessionid=zfZUKGE3RyFAVs0YQ0Poa30PEJI1GC45dacJvYO318DuaC910jn0a3ASTEv1WNqp.found02_servlet_www?html=/mypage/myLostList.do&#34;;
+		}else{
+			alert(&#34;로그인이 필요한 페이지입니다.&#34;);
+			window.location = &#34;/html.do;jsessionid=zfZUKGE3RyFAVs0YQ0Poa30PEJI1GC45dacJvYO318DuaC910jn0a3ASTEv1WNqp.found02_servlet_www?html=/member/login&amp;sub=U&amp;title=회원마당&amp;ptitle=로그인&#34;;
+		}
+	}
+	
+	function fn_login2(){
+			window.location = &#34;/html.do;jsessionid=zfZUKGE3RyFAVs0YQ0Poa30PEJI1GC45dacJvYO318DuaC910jn0a3ASTEv1WNqp.found02_servlet_www?html=/dms-sample/sample_regInput&#34;;
+	}
+	
+	$(&#39;#mainSearch&#39;).click(function(){
+		searchPro(0,1,0);
+	});
+
+	function fn_findHpInfo(){
+		window.open(&#34;https://www.handphone.or.kr/lost112/ph1_search_lost112_pop.php&#34;, &#34;popupModelCode&#34;, &#34;scrollbars=yes, resizable=no, location=yes, width=500,height=500&#34;);
+	}
+	
+	function fn_menuMove(url){ 
+		//$(&#39;#loading&#39;).fadeIn(150);
+		$(&#39;#loading_spin&#39;).spin(&#39;large&#39;,&#39;gray&#39;);
+		document.headerMap.action = url;
+	   	document.headerMap.submit();
+	}
+	
+	function toggleFocus(el) {
+		console.log(el.className);
+	    el.className  =  &#34;uin_focus&#34;;
+		console.log(el);
+	}
+	
+	function fn_clickMenu(menuNo, url, loginYn){
+// 		alert(menuNo+&#34;=============&#34;+url+&#34;=============&#34;+loginYn)
+		$(&#39;#loading_spin&#39;).spin(&#39;large&#39;,&#39;gray&#39;);
+        if ( loginYn == &#39;Y&#39; ){
+			alert(&#34;로그인이 필요한 페이지입니다.&#34;);
+			window.location = &#34;/html.do;jsessionid=zfZUKGE3RyFAVs0YQ0Poa30PEJI1GC45dacJvYO318DuaC910jn0a3ASTEv1WNqp.found02_servlet_www?html=/member/login&amp;sub=U&amp;title=회원마당&amp;ptitle=로그인&#34;;
+			return ;
+	    }else if(menuNo == &#39;EXCEPTION&#39; &amp;&amp; loginYn == &#39;N&#39;){
+	    	alert(&#34;로그아웃 후 사용가능한 페이지입니다.&#34;);
+	    	$(&#39;#loading_spin&#39;).data(&#39;spinner&#39;).stop();
+	    	return ;
+	    }
+        document.headerMap.action = url; 
+	   	document.headerMap.submit();
+	}
+
+	
+	
+//]]&gt;
+&lt;/script&gt;
+&lt;!-- 헤더 영역 --&gt;
+&lt;div class=&#34;d_direct&#34; id=&#34;accessibility&#34;&gt;
+&lt;a class=&#34;link_direct&#34; href=&#34;#lost112_body&#34;&gt;본문 바로가기&lt;/a&gt; &lt;!-- skip_contents -&gt; link_direct --&gt;
+&lt;a class=&#34;link_direct&#34; href=&#34;#lost112_main_menu&#34;&gt;메뉴 바로가기&lt;/a&gt; &lt;!-- skip_menu -&gt; link_direct --&gt;
+&lt;/div&gt;
+&lt;header&gt;
+&lt;!-- gnb --&gt;
+&lt;div id=&#34;gnb&#34;&gt;
+&lt;!-- gnb_wrap1 --&gt;
+&lt;div class=&#34;gnb_wrap1&#34;&gt;
+&lt;ul class=&#34;accessible&#34;&gt;
+&lt;li class=&#34;access_mark&#34;&gt;&lt;img alt=&#34;장애인마크&#34; src=&#34;/images/home/common/accessible_icon.png&#34;/&gt;&lt;/li&gt;
+&lt;li class=&#34;access_size&#34;&gt;글자크기&lt;/li&gt;
+&lt;li class=&#34;access_zoomout&#34;&gt;&lt;button onclick=&#34;javascript:zoomcontrol.zoomout();&#34; title=&#34;폰트 작게&#34;&gt;-&lt;/button&gt;&lt;/li&gt;
+&lt;li class=&#34;access_zoomreset&#34;&gt;&lt;button onclick=&#34;javascript:zoomcontrol.zoomreset();&#34; title=&#34;기본설정으로 돌아가기&#34;&gt;100%&lt;/button&gt;&lt;/li&gt;
+&lt;li class=&#34;access_zoomin&#34;&gt;&lt;button onclick=&#34;javascript:zoomcontrol.zoomin();&#34; title=&#34;폰트 크게&#34;&gt;+&lt;/button&gt;&lt;/li&gt;
+&lt;li class=&#34;access_contrast&#34;&gt;&lt;button class=&#34;dark&#34; title=&#34;고대비설정&#34;&gt;
+&lt;img alt=&#34;고대비설정&#34; src=&#34;/images/home/common/accessible_contrast.png&#34;/&gt;
+&lt;/button&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ul class=&#34;gnb_lang&#34;&gt;
+&lt;li&gt;&lt;a class=&#34;icons_kor&#34; href=&#34;/index.do&#34;&gt;한국어&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;icons_eng&#34; href=&#34;/manyLanguage.do?langType=en&#34; target=&#34;_blank&#34;&gt;ENGILISH&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;icons_jap&#34; href=&#34;/manyLanguage.do?langType=jp&#34; target=&#34;_blank&#34;&gt;日本語&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;icons_chi&#34; href=&#34;/manyLanguage.do?langType=ch&#34; target=&#34;_blank&#34;&gt;中文&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;!-- gnb_loginmenu --&gt;
+&lt;div class=&#34;gnb_loginmenu&#34;&gt;
+&lt;ul&gt;
+&lt;!-- 	2016-11-11 추가 및 수정 --&gt;
+&lt;li&gt;&lt;a class=&#34;gnb_login&#34; href=&#34;javascript:fn_clickMenu(&#39;MENU5400&#39;,&#39;/html.do?html=/member/login&amp;amp;sub=U&amp;amp;title=회원마당&amp;amp;ptitle=로그인&amp;amp;MENU_NO=MENU5400&#39;,&#39;N&#39;);&#34;&gt;로그인&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;gnb_join&#34; href=&#34;javascript:fn_clickMenu(&#39;MENU5200&#39;,&#39;/member/useClause.do?1=1&amp;amp;MENU_NO=MENU5200&#39;,&#39;N&#39;);&#34;&gt;회원가입&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;gnb_join&#34; href=&#34;javascript:fn_clickMenu(&#39;a&#39;,&#39;&#39;,&#39;Y&#39;);&#34;&gt;1:1 문의&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;gnb_sitemap&#34; href=&#34;javascript:fn_menuMove(&#39;/html.do?html=/minwon/sitemap&amp;amp;sub=M&amp;amp;title=정보마당&amp;amp;ptitle=사이트맵&#39;)&#34;&gt;사이트맵&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;!-- //gnb_loginmenu --&gt;
+&lt;/div&gt;
+&lt;!-- //gnb_wrap1 --&gt;
+&lt;/div&gt;
+&lt;!-- //gnb --&gt;
+&lt;!-- gnb_wrap2 --&gt;
+&lt;div class=&#34;gnb_wrap2&#34;&gt;
+&lt;!-- search_wrap --&gt;
+&lt;div class=&#34;search_wrap&#34;&gt;
+&lt;h1 class=&#34;logo&#34;&gt;
+&lt;a href=&#34;/index.do&#34; id=&#34;logoimg&#34;&gt;&lt;img alt=&#34;LOST112 경찰청 유실물 통합포털&#34; src=&#34;/images/home/common/logo.png&#34;/&gt;&lt;/a&gt;
+&lt;/h1&gt;
+&lt;form action=&#34;#none&#34; id=&#34;frmMainTopSearch&#34; method=&#34;post&#34; name=&#34;frmMainTopSearch&#34;&gt;
+&lt;fieldset&gt;
+&lt;legend&gt;통합검색&lt;/legend&gt;
+&lt;!-- searchWrap --&gt;
+&lt;div class=&#34;searchWrap&#34;&gt;
+&lt;!-- search --&gt;
+&lt;div class=&#34;search&#34;&gt;
+&lt;!-- search-box --&gt;
+&lt;div class=&#34;search-box&#34;&gt;
+&lt;!-- 									&lt;span class=&#34;search_type&#34;&gt; --&gt;
+&lt;!-- 										&lt;select id=&#34;searchCate1&#34; name=&#34;searchCate&#34; class=&#34;searchCate1&#34;&gt; --&gt;
+&lt;!-- 											&lt;option value=&#34;0&#34;&gt;통합검색&lt;/option&gt; --&gt;
+&lt;!-- 											&lt;option value=&#34;1&#34;&gt;습득물&lt;/option&gt; --&gt;
+&lt;!-- 											&lt;option value=&#34;2&#34;&gt;분실물&lt;/option&gt; --&gt;
+&lt;!-- 											&lt;option value=&#34;3&#34;&gt;타기관 습득물&lt;/option&gt; --&gt;
+&lt;!-- 											&lt;option value=&#34;4&#34;&gt;타기관 분실물&lt;/option&gt; --&gt;
+&lt;!-- 									&lt;/select&gt; --&gt;
+&lt;!-- 									&lt;/span&gt;  --&gt;
+&lt;label class=&#34;hidden&#34; for=&#34;totalSearch&#34;&gt;검색입력폼&lt;/label&gt;
+&lt;input class=&#34;input_query&#34; id=&#34;totalSearch&#34; name=&#34;totalSearch&#34; type=&#34;text&#34;/&gt;
+&lt;/div&gt;
+&lt;!-- //search-box --&gt;
+&lt;button id=&#34;mainSearch&#34; name=&#34;mainSearch&#34; title=&#34;통합검색&#34; type=&#34;button&#34;&gt;검색&lt;/button&gt;
+&lt;/div&gt;
+&lt;!-- //search --&gt;
+&lt;/div&gt;
+&lt;!-- //searchWrap --&gt;
+&lt;/fieldset&gt;
+&lt;/form&gt;
+&lt;!-- sns_menu --&gt;
+&lt;div class=&#34;sns_menu&#34;&gt;
+&lt;ul class=&#34;sns_icon&#34;&gt;
+&lt;li&gt;&lt;a class=&#34;icon_twitter&#34; href=&#34;https://twitter.com/lost112kr&#34; target=&#34;_blank&#34;&gt;&lt;img alt=&#34;트위터&#34; src=&#34;/images/home/common/icon_twitter.png&#34;/&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;icon_facebook&#34; href=&#34;https://www.facebook.com/lost112kr&#34; target=&#34;_blank&#34;&gt;&lt;img alt=&#34;페이스북&#34; src=&#34;/images/home/common/icon_facebook.png&#34;/&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;icon_kakao&#34; href=&#34;#none&#34; target=&#34;_blank&#34;&gt;&lt;img alt=&#34;카카오페이지&#34; src=&#34;/images/home/common/icon_kakao.png&#34;/&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;icon_instra&#34; href=&#34;https://www.instagram.com/lost112kr/&#34; target=&#34;_blank&#34;&gt;&lt;img alt=&#34;인스타그램&#34; src=&#34;/images/home/common/icon_insta.png&#34;/&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p class=&#34;182_logo&#34;&gt;
+&lt;img alt=&#34;경찰민원콜센터 국번없이 182&#34; src=&#34;/images/home/common/182_logo.png&#34;/&gt;
+&lt;/p&gt;
+&lt;/div&gt;
+&lt;!-- //sns_menu --&gt;
+&lt;/div&gt;
+&lt;!-- search_wrap --&gt;
+&lt;/div&gt;
+&lt;!-- //gnb_wrap2 --&gt;
+&lt;h2 class=&#34;screen_out&#34; id=&#34;lost112_main_menu&#34; tabindex=&#34;-1&#34;&gt;경찰청 유실물 종합관리시스템 메인메뉴&lt;/h2&gt;
+&lt;nav id=&#34;gnb_menu&#34;&gt;
+&lt;ul class=&#34;gnb_menu&#34;&gt;
+&lt;li&gt;
+&lt;a class=&#34;mainMenu_unselect&#34; href=&#34;javascript:fn_menuMove(&#39;/html.do;jsessionid=zfZUKGE3RyFAVs0YQ0Poa30PEJI1GC45dacJvYO318DuaC910jn0a3ASTEv1WNqp.found02_servlet_www?html=/prevent/lostDeclare&amp;amp;sub=F&amp;amp;title=유실물종합안내&amp;amp;ptitle=유실물신고절차&#39;)&#34;&gt;&lt;span&gt;유실물 종합안내&lt;/span&gt;&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a class=&#34;mainMenu_unselect&#34; href=&#34;javascript:fn_menuMove(&#39;/find/findList.do&#39;)&#34;&gt;&lt;span&gt;주인을 찾아요! (습득물)&lt;/span&gt;&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a class=&#34;mainMenu_unselect&#34; href=&#34;javascript:fn_menuMove(&#39;/lost/lostList.do&#39;)&#34;&gt;&lt;span&gt;잃어버렸나요? (분실물)&lt;/span&gt;&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a class=&#34;mainMenu_unselect&#34; href=&#34;javascript:fn_menuMove(&#39;/minwon/notice/noticeList.do&#39;)&#34;&gt;&lt;span&gt;정보마당&lt;/span&gt;&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a class=&#34;mainMenu_unselect&#34; href=&#34;javascript:fn_menuMove(&#39;/member/clauseView.do&#39;)&#34;&gt;&lt;span&gt;회원마당&lt;/span&gt;&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a class=&#34;mainMenu_unselect&#34; href=&#34;javascript:fn_clickMenu(&#39;MENU6000&#39;,&#39;&#39;,&#39;Y&#39;);&#34;&gt;&lt;span&gt;마이페이지&lt;/span&gt;&lt;/a&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/nav&gt;
+&lt;/header&gt;
+&lt;form action=&#34;#none&#34; id=&#34;headerMap&#34; method=&#34;post&#34; name=&#34;headerMap&#34;&gt;
+&lt;/form&gt;
+&lt;!-- 헤더 영역 끝 --&gt;
+&lt;!-- Header //--&gt;
+&lt;!--// container --&gt;
+&lt;!-- sub_wrapper --&gt;
+&lt;div id=&#34;sub_wrapper&#34;&gt;
+&lt;!-- 추가 도움말 영역   --&gt;
+&lt;!-- 			&lt;div class=&#34;hatena-box&#34;&gt; --&gt;
+&lt;!-- 				&lt;a href=&#34;#&#34; target=&#34;_blank&#34;&gt;&lt;img src=&#34;/images/home/common/hatena.gif&#34; alt=&#34;도움말&#34; /&gt;&lt;/a&gt; --&gt;
+&lt;!-- 			&lt;/div&gt; --&gt;
+&lt;!--// 레프트메뉴 --&gt;
+&lt;div id=&#34;smenu&#34; tabindex=&#34;-1&#34;&gt;
+&lt;!-- lnb --&gt;
+&lt;nav id=&#34;sub_lnb&#34;&gt;
+&lt;h1 class=&#34;l_subtitle&#34;&gt;&lt;span&gt;습득물&lt;/span&gt;&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a class=&#34;subMenu_select&#34; href=&#34;javascript:fn_menuMove(&#39;/find/findList.do&#39;);&#34;&gt;습득물 검색&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;subMenu_select&#34; href=&#34;javascript:fn_menuMove(&#39;/phone/phoneList.do&#39;);&#34;&gt;습득물 휴대폰 검색&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;go_select&#34; href=&#34;https://www.handphone.or.kr&#34; target=&#34;_blank&#34;&gt;핸드폰찾기콜센터 검색&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;subMenu_select&#34; href=&#34;javascript:fn_menuMove(&#39;/find/findLinkList.do&#39;);&#34;&gt;미참여기관 습득물 조회&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/nav&gt;
+&lt;/div&gt;
+&lt;!-- 레프트메뉴 //--&gt;
+&lt;!--// contents --&gt;
+&lt;h2 class=&#34;screen_out&#34; id=&#34;lost112_body&#34; tabindex=&#34;0&#34;&gt;경찰청 유실물 종합관리시스템 본문&lt;/h2&gt;
+&lt;script type=&#34;text/javascript&#34;&gt;
+	$(document).ready(function() {
+		
+ 		fnSelect(&#39;fdLctCd&#39;, &#39;LC0&#39;, &#39;&#39;, &#34;LCA000&#34;);
+ 		fnSelect(&#39;placeSeCd&#39;, &#39;LL1&#39;, &#39;&#39;, &#34;&#34;);
+//  		fnSelect(&#39;PLACE_SE_CD&#39;, &#39;LL1&#39;, &#39;&#39;);
+// // 		if(= &#39;F&#39; ){
+			
+// // 		}
+		
+ 		$(&#39;#site&#39;).val(&#39;&#39;);		
+ 		
+ 		$(&#34;#classification_name&#34;).hide();
+ 		
+ 		fnLayer(&#39;classification_name&#39;, &#39;&#39;, &#39;prdt_all&#39;);
+ 		// 검색 버튼 클릭
+ 		$(&#39;#searchMain&#39;).click(function() {
+ 			fnDate($(&#39;#startYmdInput&#39;),$(&#39;#endYmdInput&#39;));
+ 			if (bRtn == false) {
+ 				return bRtn;
+ 			}
+ 			
+ 			fn_find_selectList();
+ 		});
+
+ 		// 최근 습득물 현황 좌측 버튼 클릭
+ 		$(&#39;.list_prev&#39;).click(function() {
+ 			fn_imgLeft();
+ 		});
+
+ 		// 최근 습득물 현황 우측 버튼 클릭
+ 		$(&#39;.list_next&#39;).click(function() {
+ 			fn_imgRight();
+ 		});
+ 		
+	});
+
+	/* 글 목록 화면 function */
+	function fn_find_selectList() {
+
+		//$(&#39;#loading&#39;).fadeIn(150);
+		$(&#39;#loading_spin&#39;).spin(&#39;large&#39;, &#39;gray&#39;);
+		document.commandMap.action = &#34;/find/findList.do;jsessionid=zfZUKGE3RyFAVs0YQ0Poa30PEJI1GC45dacJvYO318DuaC910jn0a3ASTEv1WNqp.found02_servlet_www&#34;;
+
+		/*LOST112_JCG(2014-03-26)
+		관리번호 검색조건 유지를 위해 사용자 입력을 F_ATC_ID 라는 name으로 새로이 받는다.*/
+		// 		alert($(&#34;#ATC_ID&#34;).val());
+		$add(document.commandMap, &#39;F_ATC_ID&#39;, $(&#34;#ATC_ID&#34;).val());
+		$add(document.commandMap, &#39;pageIndex&#39;, 1);
+		
+		//2016-11-11 추가 [현재 페이지 LNB영역 매칭 코드 추가]
+		$add(document.commandMap, &#39;MENU_NO&#39;, &#39;&#39;);
+		
+		document.commandMap.submit();
+	}
+
+	/* 습득물 상세정보 화면 function */
+	function fn_find_detail(id, fs) {
+		//$(&#39;#loading&#39;).fadeIn(150);
+		$(&#39;#loading_spin&#39;).spin(&#39;large&#39;, &#39;gray&#39;);
+
+		/*LOST112_JCG(2014-03-26)
+		관리번호 검색조건 유지를 위해 사용자 입력을 F_ATC_ID 라는 name으로 새로이 받는다.*/
+		$add(document.commandMap, &#39;F_ATC_ID&#39;, $(&#34;#ATC_ID&#34;).val());
+
+		$add(document.commandMap, &#39;ATC_ID&#39;, id);
+		$add(document.commandMap, &#39;FD_SN&#39;, fs);
+		
+		//2016-11-11 추가 [현재 페이지 LNB영역 매칭 코드 추가]
+		$add(document.commandMap, &#39;MENU_NO&#39;, &#39;&#39;);
+
+		document.commandMap.action = &#34;/find/findDetail.do;jsessionid=zfZUKGE3RyFAVs0YQ0Poa30PEJI1GC45dacJvYO318DuaC910jn0a3ASTEv1WNqp.found02_servlet_www&#34;;
+		document.commandMap.submit();
+	}
+
+	// 최근 습득물 현황 이동 버튼
+	//LOST112_CDH(2015-02-27)
+	var old = 0;
+	var num = 0;
+	function fn_imgRight() {
+		num = old - 1;
+		if (num &gt;= -5) {
+			$(&#34;#imgList ul&#34;).animate({
+				left : parseInt($(&#34;#imgList ul li&#34;).eq(0).width() * -1)
+			}, 300, function() {
+				$(&#34;#imgList ul&#34;).css(&#34;left&#34;, &#34;0px&#34;);
+				$(&#34;#imgList ul li&#34;).eq(0).clone().appendTo($(&#34;#imgList ul&#34;));
+				$(&#34;#imgList ul li&#34;).eq(0).remove();
+			});
+			old = num;
+		}
+	}
+
+	function fn_imgLeft() {
+		var leng = $(&#34;#imgList ul li&#34;).size();
+		num = old + 1;
+		if (num &lt;= 0) {			
+			$(&#34;#imgList ul&#34;).animate(
+					{
+						left : 0
+					},
+					300,
+					function() {
+						$(&#34;#imgList ul&#34;).css(&#34;left&#34;, &#34;0px&#34;);
+// 						$(&#34;#imgList ul&#34;).css(&#34;left&#34;, parseInt($(&#34;#imgList ul li&#34;).eq(0).width() * -1));
+						$(&#34;#imgList ul li&#34;).eq(parseInt(leng - 1)).clone().prependTo($(&#34;#imgList ul&#34;));
+						$(&#34;#imgList ul li&#34;).eq(leng).remove();
+					});
+			old = num;
+		}
+	}
+
+	/* pagination 페이지 링크 function */
+	function fn_find_link_page(pageNo) {
+
+		fnDate($(&#39;#startYmdInput&#39;),$(&#39;#endYmdInput&#39;));
+		if (bRtn == false) {
+			return false;
+		}
+		//$(&#39;#loading&#39;).fadeIn(150);
+		$(&#39;#loading_spin&#39;).spin(&#39;large&#39;, &#39;gray&#39;);
+		$add(document.commandMap, &#39;pageIndex&#39;, pageNo);		
+		
+		//2016-11-11 추가 [현재 페이지 LNB영역 매칭 코드 추가]
+		$add(document.commandMap, &#39;MENU_NO&#39;, &#39;&#39;);
+		
+		document.commandMap.action = &#34;/find/findList.do;jsessionid=zfZUKGE3RyFAVs0YQ0Poa30PEJI1GC45dacJvYO318DuaC910jn0a3ASTEv1WNqp.found02_servlet_www&#34;;
+		document.commandMap.submit();
+	}
+
+	/*  레이어에서 물품 클릭시 
+		해당하는 값의 물품명과 코드명을 받아온다.
+		2014.08.26 YMYOON
+	 */
+	function fn_select_item(cate_code, cate_name, code, nm) {
+		if (code == &#39;&#39;) {
+			$(&#34;#PRDT_CL_NM&#34;).val(cate_name);
+		} else {
+			$(&#34;#PRDT_CL_NM&#34;).val(cate_name + &#34; - &#34; + nm);
+		}
+		$(&#34;#prdtClCd01&#34;).val(cate_code);
+		$(&#34;#prdtClCd02&#34;).val(code);
+		$(&#34;#classification_name&#34;).hide();
+		$(&#34;#PRDT_CL_NM&#34;).focus();
+		//$(&#34;#category-nav&#34;).hide();
+	}
+	
+	//분실물신고 로그인, 실명인증 체크
+	function fn_login(val){
+		if(val==&#34;Y&#34;){
+			var resNoYn = &#34;&#34;;
+			if(resNoYn == &#34;&#34; || resNoYn == null){
+				window.location = &#34;/html.do;jsessionid=zfZUKGE3RyFAVs0YQ0Poa30PEJI1GC45dacJvYO318DuaC910jn0a3ASTEv1WNqp.found02_servlet_www?html=/lost/firstNameCheck&amp;sub=LS&amp;title=분실물&amp;ptitle=실명인증&#34;;
+			}else{
+				window.location = &#34;/html.do;jsessionid=zfZUKGE3RyFAVs0YQ0Poa30PEJI1GC45dacJvYO318DuaC910jn0a3ASTEv1WNqp.found02_servlet_www?html=/lost/addLostView&amp;sub=LS&amp;title=분실물&amp;ptitle=분실물신고&#34;;
+			}
+		}else{
+			alert(&#34;로그인이 필요한 페이지입니다.&#34;);
+			window.location = &#34;/html.do;jsessionid=zfZUKGE3RyFAVs0YQ0Poa30PEJI1GC45dacJvYO318DuaC910jn0a3ASTEv1WNqp.found02_servlet_www?html=/member/login&amp;sub=U&amp;title=로그인&#34;;
+		}
+	}
+&lt;/script&gt;
+&lt;!-- 컨텐츠 영역 --&gt;
+&lt;div id=&#34;contents&#34;&gt;
+&lt;div class=&#34;contents_common&#34;&gt;
+&lt;nav class=&#34;sub_topnav&#34;&gt;
+&lt;a href=&#34;#&#34;&gt;HOME&lt;/a&gt; 	&amp;gt; &lt;a href=&#34;#&#34;&gt;습득물&lt;/a&gt; 	&amp;gt; &lt;a href=&#34;#&#34;&gt;습득물 검색&lt;/a&gt;
+&lt;/nav&gt;
+&lt;h2&gt;습득물 검색&lt;/h2&gt;
+&lt;span class=&#34;subtxt1&#34;&gt;아래 선택에 맞게 입력 해주세요. 분실하신 물건의 습득 상황 검색을 빠르게 도와드립니다.&lt;/span&gt;
+&lt;span class=&#34;subtxt2&#34;&gt;※ 신분증, 증명서 등은 분실자 이름으로, 휴대폰은 일련번호로 빠르고 정확하게 찾으실 수 있습니다.&lt;/span&gt;
+&lt;/div&gt;
+&lt;ul class=&#34;findInfo&#34;&gt;
+&lt;li&gt;
+&lt;span&gt;경찰청 습득물 목록에서 &lt;br/&gt;내가 잃어버린 물건을 찾았다면?&lt;/span&gt;
+&lt;button class=&#34;btn_200&#34; onclick=&#34;location.href=&#39;/html.do;jsessionid=zfZUKGE3RyFAVs0YQ0Poa30PEJI1GC45dacJvYO318DuaC910jn0a3ASTEv1WNqp.found02_servlet_www?html=/prevent/lostProcedures&amp;amp;sub=F&amp;amp;title=유실물종합안내&amp;amp;ptitle=유실물처리절차&#39;&#34; title=&#34;습득물 처리절차&#34;&gt;습득물 처리절차&lt;/button&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;span&gt;내가 잃어버린 물건을 경찰청 &lt;br/&gt;습득물 목록에서 찾을 수 없다면?&lt;/span&gt;
+&lt;button class=&#34;btn_200b&#34; onclick=&#34;fn_login(&#39;N&#39;);&#34; title=&#34;분실물 신고&#34;&gt;분실물 신고&lt;/button&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;!-- 습득물 검색창 --&gt;
+&lt;div class=&#34;findList&#34;&gt;
+&lt;div class=&#34;lost_qfind2&#34;&gt;
+&lt;form action=&#34;#none&#34; id=&#34;commandMap&#34; method=&#34;post&#34; name=&#34;commandMap&#34; onsubmit=&#34;return false;&#34;&gt;
+&lt;input id=&#34;pageIndex&#34; name=&#34;pageIndex&#34; type=&#34;hidden&#34; value=&#34;1&#34;/&gt;
+&lt;div class=&#34;qnb5_l&#34;&gt;
+&lt;fieldset class=&#34;lost_inputbox&#34;&gt;
+&lt;legend&gt;습득물 종류 입력&lt;/legend&gt;
+&lt;label for=&#34;PRDT_CL_NM&#34;&gt;분류명&lt;/label&gt;
+&lt;input class=&#34;&#34; id=&#34;PRDT_CL_NM&#34; name=&#34;PRDT_CL_NM&#34; readonly=&#34;readonly&#34; title=&#34;분류명 입력&#34; type=&#34;text&#34; value=&#34;&#34;/&gt;
+&lt;button class=&#34;btn_02&#34; onclick=&#34;showlayer(this,&#39;#classification_name&#39;);&#34; title=&#34;분류명 선택 레이어 새창&#34; type=&#34;button&#34;&gt;찾기&lt;/button&gt;
+&lt;input id=&#34;prdtClCd01&#34; name=&#34;PRDT_CL_CD01&#34; type=&#34;hidden&#34; value=&#34;&#34;/&gt;
+&lt;input id=&#34;prdtClCd02&#34; name=&#34;PRDT_CL_CD02&#34; type=&#34;hidden&#34; value=&#34;&#34;/&gt;
+&lt;/fieldset&gt;
+&lt;!-- 날짜입력 --&gt;
+&lt;fieldset class=&#34;lost_period&#34;&gt;
+&lt;legend&gt;습득기간 입력&lt;/legend&gt;
+&lt;label for=&#34;startYmdInput&#34;&gt;기간&lt;/label&gt;
+&lt;input class=&#34;search_text isNumber&#34; id=&#34;startYmdInput&#34; name=&#34;START_YMD&#34; readonly=&#34;readonly&#34; size=&#34;10&#34; title=&#34;검색시작일&#34; type=&#34;text&#34; value=&#34;20180612&#34;/&gt;
+&lt;button class=&#34;cal_btn&#34; onclick=&#34;showCalendar(this,&#39;#CalendarControl&#39;,&#39;startYmdInput&#39;,70,30);return false;&#34; title=&#34;검색 시작일 달력 레이어 새창&#34; type=&#34;button&#34;&gt;&lt;span class=&#34;hidden&#34;&gt;검색 시작일  예)2015092&lt;/span&gt;&lt;/button&gt;
+&lt;span&gt;~&lt;/span&gt;
+&lt;input class=&#34;search_text isNumber&#34; id=&#34;endYmdInput&#34; name=&#34;END_YMD&#34; readonly=&#34;readonly&#34; size=&#34;10&#34; title=&#34;검색종료일&#34; type=&#34;text&#34; value=&#34;20180626&#34;/&gt;
+&lt;button class=&#34;cal_btn&#34; onclick=&#34;showCalendar(this,&#39;#CalendarControl&#39;,&#39;endYmdInput&#39;,70,160);return false;&#34; title=&#34;검색 종료일 달력 레이어 새창&#34; type=&#34;button&#34;&gt;&lt;span class=&#34;hidden&#34;&gt;검색 종료일 예)20150925&lt;/span&gt;&lt;/button&gt;
+&lt;iframe id=&#34;CalendarControlIFrame&#34; scrolling=&#34;no&#34; title=&#34;달력&#34;&gt;&lt;/iframe&gt;
+&lt;div id=&#34;CalendarControl&#34;&gt;&lt;/div&gt;
+&lt;/fieldset&gt;
+&lt;fieldset class=&#34;lost_inputbox&#34;&gt;
+&lt;legend&gt;습득물명 입력&lt;/legend&gt;
+&lt;label for=&#34;prdtNm&#34;&gt;습득물명&lt;/label&gt;
+&lt;input class=&#34;search_text korean&#34; id=&#34;prdtNm&#34; name=&#34;PRDT_NM&#34; title=&#34;습득물명 입력&#34; type=&#34;text&#34; value=&#34;&#34;/&gt;
+&lt;/fieldset&gt;
+&lt;fieldset class=&#34;lost_inputbox&#34;&gt;
+&lt;legend&gt;보관장소 입력&lt;/legend&gt;
+&lt;label for=&#34;depPlace&#34;&gt;보관장소&lt;/label&gt;
+&lt;input class=&#34;search_text korean&#34; id=&#34;depPlace&#34; name=&#34;DEP_PLACE&#34; title=&#34;보관장소 입력&#34; type=&#34;text&#34; value=&#34;&#34;/&gt;
+&lt;/fieldset&gt;
+&lt;fieldset class=&#34;lost_inputbox&#34;&gt;
+&lt;legend&gt;접수구분 입력&lt;/legend&gt;
+&lt;label for=&#34;site&#34;&gt;접수구분&lt;/label&gt;
+&lt;select id=&#34;site&#34; name=&#34;SITE&#34; title=&#34;접수구분 선택&#34;&gt;
+&lt;option selected=&#34;selected&#34; value=&#34;&#34;&gt;선택&lt;/option&gt;
+&lt;option value=&#34;F&#34;&gt;경찰관서&lt;/option&gt;
+&lt;option value=&#34;V&#34;&gt;경찰이외의기관(지하철,공항등)&lt;/option&gt;
+&lt;/select&gt;
+&lt;/fieldset&gt;
+&lt;fieldset class=&#34;lost_inputbox&#34;&gt;
+&lt;legend&gt;습득장소 입력&lt;/legend&gt;
+&lt;label for=&#34;placeSeCd&#34;&gt;습득장소&lt;/label&gt;
+&lt;select id=&#34;placeSeCd&#34; name=&#34;PLACE_SE_CD&#34; title=&#34;습득장소 선택&#34;&gt;
+&lt;option selected=&#34;selected&#34; value=&#34;&#34;&gt;전체&lt;/option&gt;
+&lt;/select&gt;
+&lt;/fieldset&gt;
+&lt;/div&gt;
+&lt;div class=&#34;qnb5_r&#34;&gt;
+&lt;fieldset class=&#34;lost_inputbox&#34;&gt;
+&lt;legend&gt;습득지역 입력&lt;/legend&gt;
+&lt;label for=&#34;fdLctCd&#34;&gt;습득지역&lt;/label&gt;
+&lt;select class=&#34;search_text1&#34; id=&#34;fdLctCd&#34; name=&#34;FD_LCT_CD&#34; title=&#34;습득지역 선택&#34;&gt;
+&lt;option selected=&#34;selected&#34; value=&#34;&#34;&gt;선택&lt;/option&gt;
+&lt;/select&gt;
+&lt;/fieldset&gt;
+&lt;fieldset class=&#34;lost_inputbox&#34;&gt;
+&lt;legend&gt;분실자명 입력&lt;/legend&gt;
+&lt;label for=&#34;inNm&#34;&gt;분실자명&lt;/label&gt;
+&lt;input class=&#34;search_text korean&#34; id=&#34;inNm&#34; name=&#34;IN_NM&#34; title=&#34;분실자명 입력&#34; type=&#34;text&#34; value=&#34;&#34;/&gt;
+&lt;/fieldset&gt;
+&lt;fieldset class=&#34;lost_inputbox&#34;&gt;
+&lt;legend&gt;관리번호 입력&lt;/legend&gt;
+&lt;label for=&#34;ATC_ID&#34;&gt;관리번호&lt;/label&gt;
+&lt;input id=&#34;ATC_ID&#34; name=&#34;ATC_ID&#34; style=&#34;ime-mode: inactive;&#34; title=&#34;관리번호 입력&#34; type=&#34;text&#34; value=&#34;&#34;/&gt;
+&lt;input class=&#34;search_text&#34; id=&#34;F_ATC_ID&#34; name=&#34;F_ATC_ID&#34; type=&#34;hidden&#34; value=&#34;&#34;/&gt;
+&lt;/fieldset&gt;
+&lt;fieldset class=&#34;lost_inputbox&#34;&gt;
+&lt;legend&gt;모델코드 입력&lt;/legend&gt;
+&lt;label for=&#34;&#34;&gt;모델코드&lt;/label&gt;
+&lt;input class=&#34;search_text english&#34; id=&#34;mdcd&#34; name=&#34;MDCD&#34; title=&#34;모델코드 입력&#34; type=&#34;text&#34; value=&#34;&#34;/&gt;
+&lt;/fieldset&gt;
+&lt;fieldset class=&#34;lost_inputbox&#34;&gt;
+&lt;legend&gt;일련번호 입력&lt;/legend&gt;
+&lt;label for=&#34;srno&#34;&gt;일련번호&lt;/label&gt;
+&lt;input class=&#34;search_text english&#34; id=&#34;srno&#34; name=&#34;SRNO&#34; title=&#34;일련번호 입력&#34; type=&#34;text&#34; value=&#34;&#34;/&gt;
+&lt;/fieldset&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;button class=&#34;btn_01&#34; id=&#34;searchMain&#34; name=&#34;searchMain&#34; title=&#34;습득물 검색&#34; type=&#34;image&#34;&gt;검색&lt;/button&gt;&lt;/p&gt;
+&lt;/form&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;!-- //습득물 검색창 --&gt;
+&lt;!-- 습득물 게시판 리스트 --&gt;
+&lt;div class=&#34;find_listBox&#34;&gt;
+&lt;table class=&#34;type01&#34; summary=&#34;관리번호, 습득물명, 분실자명, 보관장소, 주운 일자&#34;&gt;
+&lt;caption&gt;습득물 목록 조회 결과 테이블&lt;/caption&gt;
+&lt;colgroup&gt;
+&lt;col style=&#34;width:160px&#34;&gt;&lt;/col&gt;
+&lt;col style=&#34;width:220px&#34;&gt;&lt;/col&gt;
+&lt;col style=&#34;width:&#34;&gt;&lt;/col&gt;
+&lt;col style=&#34;width:120px&#34;&gt;&lt;/col&gt;
+&lt;col style=&#34;width:100px&#34;&gt;&lt;/col&gt;
+&lt;col style=&#34;width:100px&#34;&gt;&lt;/col&gt;
+&lt;/colgroup&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th class=&#34;first&#34; scope=&#34;col&#34;&gt;관리번호&lt;/th&gt;
+&lt;th scope=&#34;col&#34;&gt;습득물명&lt;/th&gt;
+&lt;th scope=&#34;col&#34;&gt;분실자명&lt;/th&gt;
+&lt;th scope=&#34;col&#34;&gt;보관장소&lt;/th&gt;
+&lt;th scope=&#34;col&#34;&gt;연락처&lt;/th&gt;
+&lt;th scope=&#34;col&#34;&gt;주운일자&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;!-- 테이블 반복 구간 시작 --&gt;
+&lt;tr&gt;
+&lt;td class=&#34;first &#34; scope=&#34;row&#34; title=&#34;V0002502D06280018&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280018&#39;, &#39;1&#39;)&#34;&gt;V0002502D06280018&lt;/a&gt;&lt;/td&gt;
+&lt;td class=&#34;board_title1 &#34; scope=&#34;row&#34; title=&#34;카카오뱅크 라이언카드&#34;&gt;&lt;div class=&#34;title_text&#34;&gt;
+&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280018&#39;, &#39;1&#39;)&#34;&gt;카카오뱅크 라이언카드
+								&lt;/a&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;td class=&#34;&#34; scope=&#34;row&#34; title=&#34;-&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280018&#39;, &#39;1&#39;)&#34;&gt;-&lt;/a&gt;&lt;/td&gt;
+&lt;td class=&#34;&#34; scope=&#34;row&#34; title=&#34;CGV(신촌점)&#34;&gt;
+&lt;div class=&#34;losers_text&#34;&gt;
+&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280018&#39;, &#39;1&#39;)&#34;&gt;CGV(신촌점)&lt;/a&gt;
+&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&#34;first &#34; scope=&#34;row&#34; title=&#34;02-373-2995&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280018&#39;, &#39;1&#39;)&#34;&gt;02-373-2995&lt;/a&gt;&lt;/td&gt;
+&lt;td class=&#34;&#34; scope=&#34;row&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280018&#39;, &#39;1&#39;)&#34;&gt;2018-06-26&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;first &#34; scope=&#34;row&#34; title=&#34;V0002502D06280016&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280016&#39;, &#39;1&#39;)&#34;&gt;V0002502D06280016&lt;/a&gt;&lt;/td&gt;
+&lt;td class=&#34;board_title1 &#34; scope=&#34;row&#34; title=&#34;KB 국민카드&#34;&gt;&lt;div class=&#34;title_text&#34;&gt;
+&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280016&#39;, &#39;1&#39;)&#34;&gt;KB 국민카드
+								&lt;/a&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;td class=&#34;&#34; scope=&#34;row&#34; title=&#34;-&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280016&#39;, &#39;1&#39;)&#34;&gt;-&lt;/a&gt;&lt;/td&gt;
+&lt;td class=&#34;&#34; scope=&#34;row&#34; title=&#34;CGV(신촌점)&#34;&gt;
+&lt;div class=&#34;losers_text&#34;&gt;
+&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280016&#39;, &#39;1&#39;)&#34;&gt;CGV(신촌점)&lt;/a&gt;
+&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&#34;first &#34; scope=&#34;row&#34; title=&#34;02-373-2995&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280016&#39;, &#39;1&#39;)&#34;&gt;02-373-2995&lt;/a&gt;&lt;/td&gt;
+&lt;td class=&#34;&#34; scope=&#34;row&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280016&#39;, &#39;1&#39;)&#34;&gt;2018-06-26&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;first &#34; scope=&#34;row&#34; title=&#34;V0002502D06280014&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280014&#39;, &#39;1&#39;)&#34;&gt;V0002502D06280014&lt;/a&gt;&lt;/td&gt;
+&lt;td class=&#34;board_title1 &#34; scope=&#34;row&#34; title=&#34;신한카드&#34;&gt;&lt;div class=&#34;title_text&#34;&gt;
+&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280014&#39;, &#39;1&#39;)&#34;&gt;신한카드
+								&lt;/a&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;td class=&#34;&#34; scope=&#34;row&#34; title=&#34;-&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280014&#39;, &#39;1&#39;)&#34;&gt;-&lt;/a&gt;&lt;/td&gt;
+&lt;td class=&#34;&#34; scope=&#34;row&#34; title=&#34;CGV(신촌점)&#34;&gt;
+&lt;div class=&#34;losers_text&#34;&gt;
+&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280014&#39;, &#39;1&#39;)&#34;&gt;CGV(신촌점)&lt;/a&gt;
+&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&#34;first &#34; scope=&#34;row&#34; title=&#34;02-373-2995&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280014&#39;, &#39;1&#39;)&#34;&gt;02-373-2995&lt;/a&gt;&lt;/td&gt;
+&lt;td class=&#34;&#34; scope=&#34;row&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280014&#39;, &#39;1&#39;)&#34;&gt;2018-06-25&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;first &#34; scope=&#34;row&#34; title=&#34;V0002502D06280012&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280012&#39;, &#39;1&#39;)&#34;&gt;V0002502D06280012&lt;/a&gt;&lt;/td&gt;
+&lt;td class=&#34;board_title1 &#34; scope=&#34;row&#34; title=&#34;신한카드&#34;&gt;&lt;div class=&#34;title_text&#34;&gt;
+&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280012&#39;, &#39;1&#39;)&#34;&gt;신한카드
+								&lt;/a&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;td class=&#34;&#34; scope=&#34;row&#34; title=&#34;-&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280012&#39;, &#39;1&#39;)&#34;&gt;-&lt;/a&gt;&lt;/td&gt;
+&lt;td class=&#34;&#34; scope=&#34;row&#34; title=&#34;CGV(신촌점)&#34;&gt;
+&lt;div class=&#34;losers_text&#34;&gt;
+&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280012&#39;, &#39;1&#39;)&#34;&gt;CGV(신촌점)&lt;/a&gt;
+&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&#34;first &#34; scope=&#34;row&#34; title=&#34;02-373-2995&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280012&#39;, &#39;1&#39;)&#34;&gt;02-373-2995&lt;/a&gt;&lt;/td&gt;
+&lt;td class=&#34;&#34; scope=&#34;row&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280012&#39;, &#39;1&#39;)&#34;&gt;2018-06-25&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;first &#34; scope=&#34;row&#34; title=&#34;V0002502D06280010&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280010&#39;, &#39;1&#39;)&#34;&gt;V0002502D06280010&lt;/a&gt;&lt;/td&gt;
+&lt;td class=&#34;board_title1 &#34; scope=&#34;row&#34; title=&#34;열쇠&#34;&gt;&lt;div class=&#34;title_text&#34;&gt;
+&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280010&#39;, &#39;1&#39;)&#34;&gt;열쇠
+								&lt;/a&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;td class=&#34;&#34; scope=&#34;row&#34; title=&#34;-&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280010&#39;, &#39;1&#39;)&#34;&gt;-&lt;/a&gt;&lt;/td&gt;
+&lt;td class=&#34;&#34; scope=&#34;row&#34; title=&#34;CGV(신촌점)&#34;&gt;
+&lt;div class=&#34;losers_text&#34;&gt;
+&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280010&#39;, &#39;1&#39;)&#34;&gt;CGV(신촌점)&lt;/a&gt;
+&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&#34;first &#34; scope=&#34;row&#34; title=&#34;02-373-2995&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280010&#39;, &#39;1&#39;)&#34;&gt;02-373-2995&lt;/a&gt;&lt;/td&gt;
+&lt;td class=&#34;&#34; scope=&#34;row&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280010&#39;, &#39;1&#39;)&#34;&gt;2018-06-24&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;first &#34; scope=&#34;row&#34; title=&#34;V0002502D06280008&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280008&#39;, &#39;1&#39;)&#34;&gt;V0002502D06280008&lt;/a&gt;&lt;/td&gt;
+&lt;td class=&#34;board_title1 &#34; scope=&#34;row&#34; title=&#34;카페베네 카드&#34;&gt;&lt;div class=&#34;title_text&#34;&gt;
+&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280008&#39;, &#39;1&#39;)&#34;&gt;카페베네 카드
+								&lt;/a&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;td class=&#34;&#34; scope=&#34;row&#34; title=&#34;-&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280008&#39;, &#39;1&#39;)&#34;&gt;-&lt;/a&gt;&lt;/td&gt;
+&lt;td class=&#34;&#34; scope=&#34;row&#34; title=&#34;CGV(신촌점)&#34;&gt;
+&lt;div class=&#34;losers_text&#34;&gt;
+&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280008&#39;, &#39;1&#39;)&#34;&gt;CGV(신촌점)&lt;/a&gt;
+&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&#34;first &#34; scope=&#34;row&#34; title=&#34;02-373-2995&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280008&#39;, &#39;1&#39;)&#34;&gt;02-373-2995&lt;/a&gt;&lt;/td&gt;
+&lt;td class=&#34;&#34; scope=&#34;row&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280008&#39;, &#39;1&#39;)&#34;&gt;2018-06-24&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;first &#34; scope=&#34;row&#34; title=&#34;V0002502D06280006&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280006&#39;, &#39;1&#39;)&#34;&gt;V0002502D06280006&lt;/a&gt;&lt;/td&gt;
+&lt;td class=&#34;board_title1 &#34; scope=&#34;row&#34; title=&#34;주민등록증&#34;&gt;&lt;div class=&#34;title_text&#34;&gt;
+&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280006&#39;, &#39;1&#39;)&#34;&gt;주민등록증
+								&lt;/a&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;td class=&#34;&#34; scope=&#34;row&#34; title=&#34;-&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280006&#39;, &#39;1&#39;)&#34;&gt;-&lt;/a&gt;&lt;/td&gt;
+&lt;td class=&#34;&#34; scope=&#34;row&#34; title=&#34;CGV(신촌점)&#34;&gt;
+&lt;div class=&#34;losers_text&#34;&gt;
+&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280006&#39;, &#39;1&#39;)&#34;&gt;CGV(신촌점)&lt;/a&gt;
+&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&#34;first &#34; scope=&#34;row&#34; title=&#34;02-373-2995&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280006&#39;, &#39;1&#39;)&#34;&gt;02-373-2995&lt;/a&gt;&lt;/td&gt;
+&lt;td class=&#34;&#34; scope=&#34;row&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280006&#39;, &#39;1&#39;)&#34;&gt;2018-06-23&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;first &#34; scope=&#34;row&#34; title=&#34;V0002502D06280004&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280004&#39;, &#39;1&#39;)&#34;&gt;V0002502D06280004&lt;/a&gt;&lt;/td&gt;
+&lt;td class=&#34;board_title1 &#34; scope=&#34;row&#34; title=&#34;우리v체크카드&#34;&gt;&lt;div class=&#34;title_text&#34;&gt;
+&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280004&#39;, &#39;1&#39;)&#34;&gt;우리v체크카드
+								&lt;/a&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;td class=&#34;&#34; scope=&#34;row&#34; title=&#34;-&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280004&#39;, &#39;1&#39;)&#34;&gt;-&lt;/a&gt;&lt;/td&gt;
+&lt;td class=&#34;&#34; scope=&#34;row&#34; title=&#34;CGV(신촌점)&#34;&gt;
+&lt;div class=&#34;losers_text&#34;&gt;
+&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280004&#39;, &#39;1&#39;)&#34;&gt;CGV(신촌점)&lt;/a&gt;
+&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&#34;first &#34; scope=&#34;row&#34; title=&#34;02-373-2995&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280004&#39;, &#39;1&#39;)&#34;&gt;02-373-2995&lt;/a&gt;&lt;/td&gt;
+&lt;td class=&#34;&#34; scope=&#34;row&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280004&#39;, &#39;1&#39;)&#34;&gt;2018-06-23&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;first &#34; scope=&#34;row&#34; title=&#34;V0002502D06280002&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280002&#39;, &#39;1&#39;)&#34;&gt;V0002502D06280002&lt;/a&gt;&lt;/td&gt;
+&lt;td class=&#34;board_title1 &#34; scope=&#34;row&#34; title=&#34;cu멤버쉽&amp;amp;교통카드&#34;&gt;&lt;div class=&#34;title_text&#34;&gt;
+&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280002&#39;, &#39;1&#39;)&#34;&gt;cu멤버쉽&amp;amp;교통카드
+								&lt;/a&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;td class=&#34;&#34; scope=&#34;row&#34; title=&#34;-&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280002&#39;, &#39;1&#39;)&#34;&gt;-&lt;/a&gt;&lt;/td&gt;
+&lt;td class=&#34;&#34; scope=&#34;row&#34; title=&#34;CGV(신촌점)&#34;&gt;
+&lt;div class=&#34;losers_text&#34;&gt;
+&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280002&#39;, &#39;1&#39;)&#34;&gt;CGV(신촌점)&lt;/a&gt;
+&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&#34;first &#34; scope=&#34;row&#34; title=&#34;02-373-2995&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280002&#39;, &#39;1&#39;)&#34;&gt;02-373-2995&lt;/a&gt;&lt;/td&gt;
+&lt;td class=&#34;&#34; scope=&#34;row&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280002&#39;, &#39;1&#39;)&#34;&gt;2018-06-22&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;first last&#34; scope=&#34;row&#34; title=&#34;F2018062800002828&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;F2018062800002828&#39;, &#39;1&#39;)&#34;&gt;F2018062800002828&lt;/a&gt;&lt;/td&gt;
+&lt;td class=&#34;board_title1 last&#34; scope=&#34;row&#34; title=&#34;삼성 폴더폰&#34;&gt;&lt;div class=&#34;title_text&#34;&gt;
+&lt;a href=&#34;javascript:fn_find_detail(&#39;F2018062800002828&#39;, &#39;1&#39;)&#34;&gt;삼성 폴더폰
+								&lt;img alt=&#34;사진있음&#34; src=&#34;/images/sub/icon_jpg.gif&#34;/&gt;&lt;/a&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;td class=&#34; last&#34; scope=&#34;row&#34; title=&#34;-&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;F2018062800002828&#39;, &#39;1&#39;)&#34;&gt;-&lt;/a&gt;&lt;/td&gt;
+&lt;td class=&#34; last&#34; scope=&#34;row&#34; title=&#34;서울중부경찰서&#34;&gt;
+&lt;div class=&#34;losers_text&#34;&gt;
+&lt;a href=&#34;javascript:fn_find_detail(&#39;F2018062800002828&#39;, &#39;1&#39;)&#34;&gt;서울중부경찰서&lt;/a&gt;
+&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&#34;first last&#34; scope=&#34;row&#34; title=&#34;02-3396-9156&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;F2018062800002828&#39;, &#39;1&#39;)&#34;&gt;02-3396-9156&lt;/a&gt;&lt;/td&gt;
+&lt;td class=&#34; last&#34; scope=&#34;row&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;F2018062800002828&#39;, &#39;1&#39;)&#34;&gt;2018-06-19&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;!-- //테이블 반복 구간 끝 --&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;!-- //습득물 게시판 리스트 --&gt;
+&lt;!-- 게시판 페이징 --&gt;
+&lt;div class=&#34;paging&#34; id=&#34;paging&#34;&gt;
+&lt;span&gt;&lt;a class=&#34;first&#34; href=&#34;#none&#34; onclick=&#34;fn_find_link_page(1); return false;&#34;&gt;&lt;span class=&#34;skip&#34;&gt;처음&lt;/span&gt;&lt;/a&gt;&lt;a class=&#34;prev&#34; href=&#34;#none&#34; onclick=&#34;fn_find_link_page(1); &#34;&gt;&lt;span class=&#34;skip&#34;&gt;이전&lt;/span&gt;&lt;/a&gt;&lt;/span&gt;&lt;a class=&#34;on&#34; href=&#34;#none&#34;&gt;&lt;strong&gt;1&lt;/strong&gt;&lt;/a&gt;&lt;a href=&#34;#none&#34; onclick=&#34;fn_find_link_page(2); &#34;&gt;2&lt;/a&gt;&lt;a href=&#34;#none&#34; onclick=&#34;fn_find_link_page(3); &#34;&gt;3&lt;/a&gt;&lt;a href=&#34;#none&#34; onclick=&#34;fn_find_link_page(4); &#34;&gt;4&lt;/a&gt;&lt;a href=&#34;#none&#34; onclick=&#34;fn_find_link_page(5); &#34;&gt;5&lt;/a&gt;&lt;a href=&#34;#none&#34; onclick=&#34;fn_find_link_page(6); &#34;&gt;6&lt;/a&gt;&lt;a href=&#34;#none&#34; onclick=&#34;fn_find_link_page(7); &#34;&gt;7&lt;/a&gt;&lt;a href=&#34;#none&#34; onclick=&#34;fn_find_link_page(8); &#34;&gt;8&lt;/a&gt;&lt;a href=&#34;#none&#34; onclick=&#34;fn_find_link_page(9); &#34;&gt;9&lt;/a&gt;&lt;a href=&#34;#none&#34; onclick=&#34;fn_find_link_page(10); &#34;&gt;10&lt;/a&gt;&lt;span&gt;&lt;a class=&#34;next&#34; href=&#34;#none&#34; onclick=&#34;fn_find_link_page(11); &#34;&gt;&lt;span class=&#34;skip&#34;&gt;다음&lt;/span&gt;&lt;/a&gt;&lt;a class=&#34;last&#34; href=&#34;#none&#34; onclick=&#34;fn_find_link_page(494); &#34;&gt;&lt;span class=&#34;skip&#34;&gt;마지막&lt;/span&gt;&lt;/a&gt;&lt;/span&gt;
+&lt;!-- &lt;input type=&#34;hidden&#34; name=&#34;pageIndex&#34; id=&#34;pageIndex&#34; value=&#34;1&#34; /&gt; --&gt;
+&lt;/div&gt;
+&lt;!-- 최근 등록 습득물 현황 --&gt;
+&lt;div class=&#34;sub_latest_list&#34;&gt;
+&lt;h1&gt;최근 등록된 습득물 현황&lt;/h1&gt;
+&lt;div class=&#34;latest_listwrap&#34;&gt;
+&lt;div id=&#34;imgList&#34;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;a href=&#34;javascript:fn_find_detail(&#39;F2018062800000889&#39;, &#39;1&#39;)&#34;&gt;&lt;img alt=&#34;루이까또즈반지갑&#34; src=&#34;/lostnfs/images/uploadImg/thumbnail/20180628/20180628095308601.jpg&#34; style=&#34;width: 130px; height: 100px;&#34;/&gt;&lt;/a&gt;
+&lt;p class=&#34;latest_list_name&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;F2018062800000889&#39;, &#39;1&#39;)&#34;&gt;루이까또즈반지갑&lt;/a&gt;&lt;/p&gt;
+&lt;p class=&#34;latest_list_date&#34;&gt;습득일자&lt;em&gt;2018-06-26&lt;/em&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;javascript:fn_find_detail(&#39;F2018062800002421&#39;, &#39;1&#39;)&#34;&gt;&lt;img alt=&#34;POP카드(T머니카드)&#34; src=&#34;/lostnfs/images/uploadImg/thumbnail/20180628/20180628040213268.jpg&#34; style=&#34;width: 130px; height: 100px;&#34;/&gt;&lt;/a&gt;
+&lt;p class=&#34;latest_list_name&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;F2018062800002421&#39;, &#39;1&#39;)&#34;&gt;POP카드(T머니카드)&lt;/a&gt;&lt;/p&gt;
+&lt;p class=&#34;latest_list_date&#34;&gt;습득일자&lt;em&gt;2018-06-28&lt;/em&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;javascript:fn_find_detail(&#39;F2018062800002348&#39;, &#39;1&#39;)&#34;&gt;&lt;img alt=&#34;삼성갤럭시S7&#34; src=&#34;/lostnfs/images/uploadImg/thumbnail/20180628/20180628042159720.jpg&#34; style=&#34;width: 130px; height: 100px;&#34;/&gt;&lt;/a&gt;
+&lt;p class=&#34;latest_list_name&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;F2018062800002348&#39;, &#39;1&#39;)&#34;&gt;삼성갤럭시S7&lt;/a&gt;&lt;/p&gt;
+&lt;p class=&#34;latest_list_date&#34;&gt;습득일자&lt;em&gt;2018-06-28&lt;/em&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;javascript:fn_find_detail(&#39;F2018062800002162&#39;, &#39;1&#39;)&#34;&gt;&lt;img alt=&#34;LG휴대폰&#34; src=&#34;/lostnfs/images/uploadImg/thumbnail/20180628/20180628053744717.jpg&#34; style=&#34;width: 130px; height: 100px;&#34;/&gt;&lt;/a&gt;
+&lt;p class=&#34;latest_list_name&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;F2018062800002162&#39;, &#39;1&#39;)&#34;&gt;LG휴대폰&lt;/a&gt;&lt;/p&gt;
+&lt;p class=&#34;latest_list_date&#34;&gt;습득일자&lt;em&gt;2018-03-01&lt;/em&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;javascript:fn_find_detail(&#39;F2018062800002134&#39;, &#39;1&#39;)&#34;&gt;&lt;img alt=&#34;여성 장지갑&#34; src=&#34;/lostnfs/images/uploadImg/thumbnail/20180628/20180628034524616.jpg&#34; style=&#34;width: 130px; height: 100px;&#34;/&gt;&lt;/a&gt;
+&lt;p class=&#34;latest_list_name&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;F2018062800002134&#39;, &#39;1&#39;)&#34;&gt;여성 장지갑&lt;/a&gt;&lt;/p&gt;
+&lt;p class=&#34;latest_list_date&#34;&gt;습득일자&lt;em&gt;2018-06-28&lt;/em&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;javascript:fn_find_detail(&#39;F2018062800002098&#39;, &#39;1&#39;)&#34;&gt;&lt;img alt=&#34;아이폰&#34; src=&#34;/lostnfs/images/uploadImg/thumbnail/20180628/20180628053425823.jpg&#34; style=&#34;width: 130px; height: 100px;&#34;/&gt;&lt;/a&gt;
+&lt;p class=&#34;latest_list_name&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;F2018062800002098&#39;, &#39;1&#39;)&#34;&gt;아이폰&lt;/a&gt;&lt;/p&gt;
+&lt;p class=&#34;latest_list_date&#34;&gt;습득일자&lt;em&gt;2018-06-24&lt;/em&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;javascript:fn_find_detail(&#39;F2018062800002011&#39;, &#39;1&#39;)&#34;&gt;&lt;img alt=&#34;lg휴대폰&#34; src=&#34;/lostnfs/images/uploadImg/thumbnail/20180628/20180628030707299.jpg&#34; style=&#34;width: 130px; height: 100px;&#34;/&gt;&lt;/a&gt;
+&lt;p class=&#34;latest_list_name&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;F2018062800002011&#39;, &#39;1&#39;)&#34;&gt;lg휴대폰&lt;/a&gt;&lt;/p&gt;
+&lt;p class=&#34;latest_list_date&#34;&gt;습득일자&lt;em&gt;2018-06-28&lt;/em&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;javascript:fn_find_detail(&#39;F2018062800001970&#39;, &#39;1&#39;)&#34;&gt;&lt;img alt=&#34;지갑&#34; src=&#34;/lostnfs/images/uploadImg/thumbnail/20180628/r_20180628032720422.jpg&#34; style=&#34;width: 130px; height: 100px;&#34;/&gt;&lt;/a&gt;
+&lt;p class=&#34;latest_list_name&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;F2018062800001970&#39;, &#39;1&#39;)&#34;&gt;지갑&lt;/a&gt;&lt;/p&gt;
+&lt;p class=&#34;latest_list_date&#34;&gt;습득일자&lt;em&gt;2018-06-27&lt;/em&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;javascript:fn_find_detail(&#39;F2018062800001809&#39;, &#39;1&#39;)&#34;&gt;&lt;img alt=&#34;남성용 지갑&#34; src=&#34;/lostnfs/images/uploadImg/thumbnail/20180628/r_20180628044335809.jpg&#34; style=&#34;width: 130px; height: 100px;&#34;/&gt;&lt;/a&gt;
+&lt;p class=&#34;latest_list_name&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;F2018062800001809&#39;, &#39;1&#39;)&#34;&gt;남성용 지갑&lt;/a&gt;&lt;/p&gt;
+&lt;p class=&#34;latest_list_date&#34;&gt;습득일자&lt;em&gt;2018-06-22&lt;/em&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;javascript:fn_find_detail(&#39;F2018062800001761&#39;, &#39;1&#39;)&#34;&gt;&lt;img alt=&#34;남성용 카드지갑&#34; src=&#34;/lostnfs/images/uploadImg/thumbnail/20180628/r_20180628021500259.jpg&#34; style=&#34;width: 130px; height: 100px;&#34;/&gt;&lt;/a&gt;
+&lt;p class=&#34;latest_list_name&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;F2018062800001761&#39;, &#39;1&#39;)&#34;&gt;남성용 카드지갑&lt;/a&gt;&lt;/p&gt;
+&lt;p class=&#34;latest_list_date&#34;&gt;습득일자&lt;em&gt;2018-06-20&lt;/em&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;button class=&#34;list_prev&#34; title=&#34;최근 등록 습득물 현황 이전&#34; type=&#34;button&#34;&gt;이전&lt;/button&gt;
+&lt;button class=&#34;list_next&#34; title=&#34;최근 등록 습득물 현황 다음&#34; type=&#34;button&#34;&gt;다음&lt;/button&gt;
+&lt;/div&gt;
+&lt;!-- //최근 등록 습득물 현황 --&gt;
+&lt;!-- // 물품분류 레이어 --&gt;
+&lt;div class=&#34;pop_layer1&#34; id=&#34;classification_name&#34;&gt;&lt;/div&gt;
+&lt;!-- 페이지 만족도 --&gt;
+&lt;!DOCTYPE html PUBLIC &#34;-//W3C//DTD XHTML 1.0 Transitional//EN&#34; &#34;http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd&#34;&gt;
+
+&lt;script language=&#34;javascript&#34; src=&#34;/js/jquery.base64.js&#34; type=&#34;text/javascript&#34;&gt;&lt;/script&gt;
+&lt;script type=&#34;text/javascript&#34;&gt;
+
+	/* $(document).ready(function() {
+		jQuery.ajax( {
+			url : &#39;/opinionInfo.do&#39;,
+			type : &#39;post&#39;,
+			data : &#39;page=&#39;+ $.base64(&#39;encode&#39;, encodeURIComponent($(location).attr(&#39;pathname&#39;)+$(location).attr(&#39;search&#39;))),
+
+			success : function(data) {
+				$(&#39;#damdang&#39;).html(
+						data.info.damdang );
+				$(&#39;#damtel&#39;).html(data.info.damtel);
+				$(&#39;#menuNo&#39;).val(data.info.seq);
+			},
+			error : function(data) {
+				$(&#39;#pageopinion&#39;).html(&#39;&amp;nbsp;&#39;);
+			}
+		});
+		
+	}); */
+
+// 	function opinionSubmit() {
+		
+// 		var string = $(&#34;form[name=ratingForm]&#34;).serialize();
+// 		jQuery.ajax( {
+// 				url : &#39;/opinionSave.do&#39;,
+// 				type : &#39;post&#39;,
+// 				data : string,
+// 				success : function(data) {
+// 					if (data.info.rst == &#39;F&#39;) {
+// 						alert(data.info.msg);
+// 						$(&#34;#opinionlist&#34;).hide();
+// 					} else if (data.info.rst == &#39;S&#39;) {
+// 						alert(&#34;평가가 완료되었습니다.\n 감사합니다.&#34;);
+// 						$(&#34;#opinionlist&#34;).hide();
+// 					}
+// 				},
+// 				error : function(data) {
+// 					alert(&#39;평가정보 저장 중 오류가 발생하였습니다.\n 시스템 관리자에게 문의해 주시기 바랍니다.&#39;);
+// 				}
+// 			});
+		
+// 	}
+	
+	$(document).ready(function() {
+		jQuery.ajax( {
+			url : &#39;/opinionInfo.do&#39;,
+			type : &#39;post&#39;,
+			data : &#39;page=&#39;
+			+ $.base64(&#39;encode&#39;, encodeURIComponent($(location).attr(&#39;pathname&#39;)+$(location).attr(&#39;search&#39;))),
+			success : function(data) {
+				if(data &amp;&amp; data.info) {
+					if(data.info.hasOwnProperty(&#39;damdang&#39;)) $(&#39;#damdang&#39;).html(data.info.damdang );
+					if(data.info.hasOwnProperty(&#39;damtel&#39;)) $(&#39;#damtel&#39;).html(data.info.damtel);
+					if(data.info.hasOwnProperty(&#39;seq&#39;)) $(&#39;#menuNo&#39;).val(data.info.seq);
+				}
+			},
+			error : function(data) {
+				$(&#39;#pageopinion&#39;).html(&#39;&amp;nbsp;&#39;);
+			}
+		});
+	});
+	
+	function opinionSubmit(val) {
+		if(val==&#34;Y&#34;){
+			var string = $(&#34;form[name=ratingForm]&#34;).serialize();
+			jQuery.ajax( {
+					url : &#39;/opinionSave.do&#39;,
+					type : &#39;post&#39;,
+					data : string,
+					success : function(data) {
+						if (data.info.rst == &#39;F&#39;) {
+							alert(data.info.msg);
+							$(&#34;#opinionlist&#34;).hide();
+						} else if (data.info.rst == &#39;S&#39;) {
+							alert(&#34;평가가 완료되었습니다.\n 감사합니다.&#34;);
+							$(&#34;#opinionlist&#34;).hide();
+							$(&#34;#textOpinion_an&#34;).val(&#34;&#34;);
+						}
+					},
+					error : function(data) {
+						alert(&#39;평가정보 저장 중 오류가 발생하였습니다.\n 시스템 관리자에게 문의해 주시기 바랍니다.&#39;);
+					}
+				});
+		} else {
+			alert(&#34;로그인이 필요한 페이지입니다.&#34;);
+			window.location = &#34;/member/login&amp;sub=U&amp;title=로그인&#34;;
+		}
+	}
+	
+
+&lt;/script&gt;
+&lt;!-- 페이지 만족도 --&gt;
+&lt;div class=&#34;page_satisfaction&#34;&gt;
+&lt;form method=&#34;post&#34; name=&#34;ratingForm&#34; onsubmit=&#34;return false;&#34;&gt;
+&lt;fieldset&gt;
+&lt;legend&gt;페이지 만족도 양식&lt;/legend&gt;
+&lt;input id=&#34;menuNo&#34; name=&#34;menuNo&#34; type=&#34;hidden&#34;/&gt;
+&lt;dl class=&#34;pagevoit&#34;&gt;
+&lt;dt&gt;페이지 만족도&lt;/dt&gt;
+&lt;dd&gt;
+&lt;input checked=&#34;checked&#34; id=&#34;s5&#34; name=&#34;rate&#34; type=&#34;radio&#34; value=&#34;5&#34;/&gt;&lt;label for=&#34;s5&#34;&gt;매우만족&lt;/label&gt;
+&lt;input id=&#34;s4&#34; name=&#34;rate&#34; type=&#34;radio&#34; value=&#34;4&#34;/&gt;&lt;label for=&#34;s4&#34;&gt;만족&lt;/label&gt;
+&lt;input id=&#34;s3&#34; name=&#34;rate&#34; type=&#34;radio&#34; value=&#34;3&#34;/&gt;&lt;label for=&#34;s3&#34;&gt;보통&lt;/label&gt;
+&lt;input id=&#34;s2&#34; name=&#34;rate&#34; type=&#34;radio&#34; value=&#34;2&#34;/&gt;&lt;label for=&#34;s2&#34;&gt;불만&lt;/label&gt;
+&lt;input id=&#34;s1&#34; name=&#34;rate&#34; type=&#34;radio&#34; value=&#34;1&#34;/&gt;&lt;label for=&#34;s1&#34;&gt;매우불만&lt;/label&gt;
+&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;p class=&#34;pagevoit_btn&#34;&gt;
+&lt;input class=&#34;input_txt&#34; id=&#34;textOpinion_an&#34; name=&#34;msg&#34; placeholder=&#34;남기실 말을 적어주세요.&#34; title=&#34;페이지만족도&#34; type=&#34;text&#34;/&gt;
+&lt;button class=&#34;btn_03&#34; id=&#34;opinionlist&#34; onclick=&#34;opinionSubmit(&#39;N&#39;);&#34; title=&#34;페이지만족도 등록하기&#34;&gt;등록하기&lt;/button&gt;
+&lt;/p&gt;
+&lt;/fieldset&gt;
+&lt;/form&gt;
+&lt;dl class=&#34;pagemanager&#34;&gt;
+&lt;dt&gt;자료관리담당:&lt;/dt&gt;
+&lt;dd&gt;생활질서계&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;dl class=&#34;pagemanager_tel&#34;&gt;
+&lt;dt&gt;연락처:&lt;/dt&gt;
+&lt;dd&gt;&lt;a href=&#34;tel:0231503578&#34;&gt;02-3150-3578&lt;/a&gt; (유실물 관련 문의는 상세화면의 보관장소 연락처로 문의바랍니다.)&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;/div&gt;
+&lt;!-- // 페이지 만족도 끝 --&gt;
+&lt;!-- 페이지 만족도 끝 --&gt;
+&lt;/div&gt;
+&lt;!--// opinion --&gt;
+&lt;!--// opinion --&gt;
+&lt;!--// contents --&gt;
+&lt;/div&gt;
+&lt;!-- container //--&gt;
+&lt;!-- 	2016-11-11 추가 및 수정 --&gt;
+&lt;!--// qMenu --&gt;
+&lt;!-- qMenu //--&gt;
+&lt;!--// footer --&gt;
+&lt;script language=&#34;javascript&#34; src=&#34;/js/jquery.base64.js&#34; type=&#34;text/javascript&#34;&gt;&lt;/script&gt;
+&lt;script type=&#34;text/javascript&#34;&gt;
+	/* $(document).ready(function() {
+		jQuery.ajax( {
+			url : &#39;/opinionInfo.do&#39;,
+			type : &#39;post&#39;,
+			data : &#39;page=&#39;
+			+ $.base64(&#39;encode&#39;, encodeURIComponent($(location).attr(&#39;pathname&#39;)+$(location).attr(&#39;search&#39;))),
+			success : function(data) {
+				$(&#39;#damdang&#39;).html(
+						data.info.damdang );
+				$(&#39;#damtel&#39;).html(data.info.damtel);
+				$(&#39;#menuNo&#39;).val(data.info.seq);
+			},
+			error : function(data) {
+				$(&#39;#pageopinion&#39;).html(&#39;&amp;nbsp;&#39;);
+			}
+		});
+		fnBanner(&#39;banner_list&#39;, &#39;adminBanner_gridList&#39;);
+		
+	}); */
+
+	function policy_open() {
+		window.open(&#34;/ps_auth.html&#34;, &#34;new_popup1&#34;,
+				&#34;height=800,width=623,scrollbars=yes&#34;);
+	}
+	
+	function opinionSubmit(val) {
+		if(val==&#34;Y&#34;){
+			var string = $(&#34;form[name=ratingForm]&#34;).serialize();
+			jQuery.ajax( {
+					url : &#39;/opinionSave.do&#39;,
+					type : &#39;post&#39;,
+					data : string,
+					success : function(data) {
+						if (data.info.rst == &#39;F&#39;) {
+							alert(data.info.msg);
+							$(&#34;#opinionlist&#34;).hide();
+						} else if (data.info.rst == &#39;S&#39;) {
+							alert(&#34;평가가 완료되었습니다.\n 감사합니다.&#34;);
+							$(&#34;#opinionlist&#34;).hide();
+						}
+					},
+					error : function(data) {
+						alert(&#39;평가정보 저장 중 오류가 발생하였습니다.\n 시스템 관리자에게 문의해 주시기 바랍니다.&#39;);
+					}
+				});
+		} else {
+			alert(&#34;로그인이 필요한 페이지입니다.&#34;);
+			window.location = &#34;/html.do;jsessionid=zfZUKGE3RyFAVs0YQ0Poa30PEJI1GC45dacJvYO318DuaC910jn0a3ASTEv1WNqp.found02_servlet_www?html=/member/login&amp;sub=U&amp;title=로그인&#34;;
+		}
+	}
+&lt;/script&gt;
+&lt;!-- &lt;div class=&#34;banner_zone_sub&#34;&gt; --&gt;
+&lt;!-- 	&lt;h2 class=&#34;blind&#34;&gt;패밀리 사이트 배너존&lt;/h2&gt; --&gt;
+&lt;!-- 	&lt;div class=&#34;ctrl&#34;&gt; --&gt;
+&lt;!-- 		&lt;span&gt;배너모음&lt;/span&gt; --&gt;
+&lt;!-- 		&lt;div class=&#34;control&#34;&gt; --&gt;
+&lt;!-- 			&lt;button type=&#34;button&#34; class=&#34;banner_prev&#34;&gt; --&gt;
+&lt;!-- 				&lt;span&gt;이전배너보기&lt;/span&gt; --&gt;
+&lt;!-- 			&lt;/button&gt; --&gt;
+&lt;!-- 			&lt;button type=&#34;button&#34; class=&#34;banner_play&#34;&gt; --&gt;
+&lt;!-- 				&lt;span&gt;배너재생&lt;/span&gt; --&gt;
+&lt;!-- 			&lt;/button&gt; --&gt;
+&lt;!-- 			&lt;button type=&#34;button&#34; class=&#34;banner_stop&#34;&gt; --&gt;
+&lt;!-- 				&lt;span&gt;배너정지&lt;/span&gt; --&gt;
+&lt;!-- 			&lt;/button&gt; --&gt;
+&lt;!-- 			&lt;button type=&#34;button&#34; class=&#34;banner_next&#34;&gt; --&gt;
+&lt;!-- 				&lt;span&gt;다음배너보기&lt;/span&gt; --&gt;
+&lt;!-- 			&lt;/button&gt; --&gt;
+&lt;!-- 		&lt;/div&gt; --&gt;
+&lt;!-- 	&lt;/div&gt; --&gt;
+&lt;!-- 	&lt;div id=&#34;banner_list&#34; class=&#34;family_wrap&#34;&gt;&lt;/div&gt; --&gt;
+&lt;!-- &lt;/div&gt; --&gt;
+&lt;!-- &lt;div id=&#34;footer&#34; class=&#34;sub_footer&#34;&gt; --&gt;
+&lt;!-- 	&lt;div id=&#34;main_w&#34;&gt; --&gt;
+&lt;!-- 		&lt;div class=&#34;accessibility_mark&#34;&gt; --&gt;
+&lt;!-- 			&lt;a href=&#34;/web_accessibility.html&#34; --&gt;
+&lt;!-- 				onclick=&#34;open_window(this.href,&#39;accessibility&#39;,700,850);return false;&#34;&gt;&lt;img --&gt;
+&lt;!-- 				src=&#34;/../../images/main/web_accessibility.png&#34; --&gt;
+&lt;!-- 				alt=&#34;미래창조과학부 WEB ACCESSIBILITY 마크(웹 접근성 품질인증 마크)&#34; --&gt;
+&lt;!-- 				title=&#34;국가 공인 인증기관 : 웹와치&#34;/&gt;&lt;/a&gt; --&gt;
+&lt;!-- 			&lt;img src=&#34;/../../images/main/gov30.gif&#34; --&gt;
+&lt;!-- 				alt=&#34;2015년도 정부3.0 최우수기관&#34; --&gt;
+&lt;!-- 				title=&#34;정부3.0 최우수기관&#34;/&gt;&lt;br/&gt; --&gt;
+&lt;!-- 		&lt;/div&gt; --&gt;
+&lt;!-- 		&lt;div class=&#34;copyright&#34;&gt;Copyright(c) 2011 경찰청 all rights --&gt;
+&lt;!-- 			reserved.&lt;/div&gt; --&gt;
+&lt;!-- 		&lt;div class=&#34;copy_txt&#34;&gt; --&gt;
+&lt;!-- 			&lt;ul&gt; --&gt;
+&lt;!-- 				&lt;li&gt;&lt;span class=&#34;red&#34;&gt;&lt;a --&gt;
+&lt;!-- 						href=&#34;/html.do?html=/prevent/lostHelp&amp;amp;sub=M&amp;amp;title=도움말&#34;&gt;사이트 --&gt;
+&lt;!-- 							이용안내&lt;/a&gt;&lt;/span&gt; | &lt;span class=&#34;red&#34;&gt;&lt;a href=&#34;#none&#34; --&gt;
+&lt;!-- 						onclick=&#34;policy_open();return false;&#34; title=&#34;새창&#34;&gt;개인정보처리방침&lt;/a&gt;&lt;/span&gt;&lt;/li&gt; --&gt;
+&lt;!-- 				&lt;li&gt;03739 서울특별시 서대문구 통일로 97 민원전화 : 국번없이 182&lt;/li&gt; --&gt;
+&lt;!-- 				&lt;li&gt;홈페이지에 게시된 이메일주소가 자동수집되는 것을 거부하며,&lt;br /&gt; 이를 위반 시 처벌될 수 있음을 --&gt;
+&lt;!-- 					양지하여 주시기 바랍니다. --&gt;
+&lt;!-- 				&lt;/li&gt; --&gt;
+&lt;!-- 			&lt;/ul&gt; --&gt;
+&lt;!-- 		&lt;/div&gt; --&gt;
+&lt;!-- 		&lt;div class=&#34;go_service&#34;&gt; --&gt;
+&lt;!-- 			&lt;h3 class=&#34;blind&#34;&gt; --&gt;
+&lt;!-- 				&lt;span&gt;바로가기 서비스&lt;/span&gt; --&gt;
+&lt;!-- 			&lt;/h3&gt; --&gt;
+&lt;!-- 			&lt;ul&gt; --&gt;
+&lt;!-- 				&lt;li&gt;&lt;label for=&#34;sl_gotot1&#34; class=&#34;hid&#34;&gt;사이버경찰청&lt;/label&gt; &lt;select --&gt;
+&lt;!-- 					id=&#34;sl_gotot1&#34; class=&#34;w_140 select_language1 mr_4&#34;&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://www.police.go.kr/&#34;&gt;사이버경찰청&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option --&gt;
+&lt;!-- 							value=&#34;http://www.police.go.kr/portal/main/contents.do?menuNo=200101&#34;&gt;정보공개&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://www.police.go.kr/assembly/main.do&#34;&gt;국회정보공개&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option --&gt;
+&lt;!-- 							value=&#34;http://www.police.go.kr/portal/bbs/list.do?bbsId=B0000003&amp;amp;menuNo=200052&#34;&gt;국민마당&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://cyber112.police.go.kr/cyber112/main.do&#34;&gt;신고민원포털&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option --&gt;
+&lt;!-- 							value=&#34;http://cyber112.police.go.kr/cyber112/main/contents.do?menuNo=1200052&#34;&gt;교통법규위반신고&lt;/option&gt; --&gt;
+&lt;!-- 				&lt;/select&gt; --&gt;
+&lt;!-- 					&lt;button type=&#34;button&#34; title=&#34;새창&#34; class=&#34;go_select&#34;&gt;GO&lt;/button&gt;&lt;/li&gt; --&gt;
+&lt;!-- 				&lt;li&gt;&lt;label for=&#34;sl_gotot2&#34; class=&#34;hid&#34;&gt;지방청/부속기관&lt;/label&gt; &lt;select --&gt;
+&lt;!-- 					id=&#34;sl_gotot2&#34; class=&#34;w_140 select_language1 mr_4&#34;&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;#&#34;&gt;지방청/부속기관&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://www.smpa.go.kr&#34;&gt;서울지방경찰청&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://www.bspolice.go.kr&#34;&gt;부산지방경찰청&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://www.dgpolice.go.kr&#34;&gt;대구지방경찰청&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://www.icpolice.go.kr&#34;&gt;인천지방경찰청&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://www.gjpolice.go.kr&#34;&gt;광주지방경찰청&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://www.djpolice.go.kr&#34;&gt;대전지방경찰청&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://www.uspolice.go.kr&#34;&gt;울산지방경찰청&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://www.ggpolice.go.kr&#34;&gt;경기남부지방경찰청&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://www.ggbpolice.go.kr&#34;&gt;경기북부지방경찰청&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://www.gwpolice.go.kr&#34;&gt;강원지방경찰청&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://www.cbpolice.go.kr&#34;&gt;충북지방경찰청&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://www.cnpolice.go.kr&#34;&gt;충남지방경찰청&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://www.jbpolice.go.kr&#34;&gt;전북지방경찰청&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://www.jnpolice.go.kr&#34;&gt;전남지방경찰청&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://www.gbpolice.go.kr&#34;&gt;경북지방경찰청&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://www.gnpolice.go.kr&#34;&gt;경남지방경찰청&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://www.jjpolice.go.kr&#34;&gt;제주지방경찰청&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://www.police.ac.kr&#34;&gt;경찰대학&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://www.pti.go.kr&#34;&gt;경찰교육원&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://www.cpa.go.kr&#34;&gt;중앙경찰학교&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://www.kpia.go.kr/&#34;&gt;경찰수사연수원&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://www.koroad.or.kr&#34;&gt;도로교통공단&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://www.nph.go.kr&#34;&gt;경찰병원&lt;/option&gt; --&gt;
+&lt;!-- 				&lt;/select&gt; --&gt;
+&lt;!-- 					&lt;button type=&#34;button&#34; title=&#34;새창&#34; class=&#34;go_select&#34;&gt;GO&lt;/button&gt;&lt;/li&gt; --&gt;
+&lt;!-- 				&lt;li&gt;&lt;label for=&#34;sl_gotot3&#34; class=&#34;hid&#34;&gt;업무 관련 사이트&lt;/label&gt; &lt;select --&gt;
+&lt;!-- 					id=&#34;sl_gotot3&#34; class=&#34;w_140 select_language1 mr_4&#34;&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;#&#34;&gt;업무 관련 사이트&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://www.police.go.kr/commission/main.do&#34;&gt;경찰위원회&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://www.ctrc.go.kr&#34;&gt;사이버테러대응센터&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://www.kpsi.go.kr/&#34;&gt;경찰과학수사&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://www.safe182.go.kr/&#34;&gt;안전 Dream&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://www.policemuseum.go.kr/kr/&#34;&gt;경찰박물관&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://www.police.go.kr/HR&#34;&gt;인권센터&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://cyberbureau.police.go.kr/&#34;&gt;사이버안전국&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://net-durumi.netan.go.kr/&#34;&gt;넷두루미&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://susa.go.kr&#34;&gt;수사구조개혁&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://www.112119.in/&#34;&gt;공상자후원회&lt;/option&gt; --&gt;
+&lt;!-- 						&lt;option value=&#34;http://www.chamsuri.co.kr/&#34;&gt;참수리사랑&lt;/option&gt; --&gt;
+&lt;!-- 				&lt;/select&gt; --&gt;
+&lt;!-- 					&lt;button type=&#34;button&#34; title=&#34;새창&#34; class=&#34;go_select&#34;&gt;GO&lt;/button&gt;&lt;/li&gt; --&gt;
+&lt;!-- 			&lt;/ul&gt; --&gt;
+&lt;!-- 		&lt;/div&gt; --&gt;
+&lt;!-- 	&lt;/div&gt; --&gt;
+&lt;!-- &lt;/div&gt; --&gt;
+&lt;!-- footer //--&gt;
+&lt;!-- 푸터 영역 --&gt;
+&lt;footer&gt;
+&lt;div class=&#34;footer_content&#34;&gt;
+&lt;p class=&#34;accessibility_mark&#34;&gt;
+&lt;a href=&#34;http://www.kwacc.or.kr/WACertificate/WAMark&#34;&gt;
+&lt;img alt=&#34;국가공인 웹 접근성 품질인증마크_(사)한국시각장애인연합회 (2017.05.31~2018.05.30)&#34; class=&#34;wa_icon&#34; src=&#34;/images/home/common/web_accessibility_2017.png&#34; title=&#34;한국웹접근성평가센터&#34;/&gt;
+&lt;/a&gt;
+&lt;!-- 				&lt;img src=&#34;/images/home/common/gov30.gif&#34; class=&#34;gov30icon&#34; alt=&#34;2015년도 정부3.0 최우수기관&#34; title=&#34;정부3.0 최우수기관&#34; /&gt; --&gt;
+&lt;/p&gt;
+&lt;div class=&#34;footer_txt&#34;&gt;
+&lt;p class=&#34;footer_policy&#34;&gt;
+&lt;a href=&#34;javascript:fn_menuMove(&#39;/html.do;jsessionid=zfZUKGE3RyFAVs0YQ0Poa30PEJI1GC45dacJvYO318DuaC910jn0a3ASTEv1WNqp.found02_servlet_www?html=/prevent/lostDeclare&amp;amp;sub=F&amp;amp;title=유실물 종합안내&amp;amp;ptitle=유실물신고절차&#39;)&#34; title=&#34;사이트 이용안내&#34;&gt;사이트 이용안내&lt;/a&gt; | 
+					&lt;a href=&#34;#&#34; onclick=&#34;policy_open();return false;&#34; target=&#34;_blank&#34; title=&#34;개인정보처리방침 새창&#34;&gt;개인정보처리방침&lt;/a&gt;
+&lt;/p&gt;
+&lt;address&gt;
+					03739 서울특별시 서대문구 통일로 97 | 민원전화 : 국번없이 182&lt;br/&gt; 홈페이지에 게시된 이메일주소가
+					자동수집되는 것을 거부하며, 이를 위반 시 처벌될 수 있음을 양지하여 주시기 바랍니다.
+				&lt;/address&gt;
+&lt;small class=&#34;copyright&#34;&gt;Copyright(c) 2016 경찰청 all rights
+					reserved.&lt;/small&gt;
+&lt;/div&gt;
+&lt;p class=&#34;footer_182_logo&#34;&gt;
+&lt;img alt=&#34;경찰민원콜센터 국번없이 182&#34; src=&#34;/images/home/common/182_logo.png&#34;/&gt;
+&lt;/p&gt;
+&lt;!-- go service --&gt;
+&lt;div class=&#34;go_service&#34;&gt;
+&lt;h1 class=&#34;hidden&#34;&gt;
+&lt;span&gt;바로가기 서비스&lt;/span&gt;
+&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;select title=&#34;사이버경찰청 관련 사이트&#34;&gt;
+&lt;optgroup label=&#34;사이버경찰청&#34;&gt;
+&lt;option value=&#34;http://www.police.go.kr/&#34;&gt;사이버경찰청&lt;/option&gt;
+&lt;option value=&#34;http://www.police.go.kr/portal/main/contents.do?menuNo=200101&#34;&gt;정보공개&lt;/option&gt;
+&lt;option value=&#34;http://www.police.go.kr/assembly/main.do&#34;&gt;국회정보공개&lt;/option&gt;
+&lt;option value=&#34;http://www.police.go.kr/portal/bbs/list.do?bbsId=B0000003&amp;amp;menuNo=200052&#34;&gt;국민마당&lt;/option&gt;
+&lt;option value=&#34;http://cyber112.police.go.kr/cyber112/main.do&#34;&gt;신고민원포털&lt;/option&gt;
+&lt;option value=&#34;http://cyber112.police.go.kr/cyber112/main/contents.do?menuNo=1200052&#34;&gt;교통법규위반신고&lt;/option&gt;
+&lt;/optgroup&gt;
+&lt;/select&gt;
+&lt;button class=&#34;go_select&#34; title=&#34;사이버경찰청 관련 사이트 새창&#34; type=&#34;button&#34;&gt;GO&lt;/button&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;select title=&#34;지방청/부속기관 관련 사이트&#34;&gt;
+&lt;optgroup label=&#34;지방청/부속기관&#34;&gt;
+&lt;option value=&#34;#&#34;&gt;지방청/부속기관&lt;/option&gt;
+&lt;option value=&#34;http://www.smpa.go.kr&#34;&gt;서울지방경찰청&lt;/option&gt;
+&lt;option value=&#34;http://www.bspolice.go.kr&#34;&gt;부산지방경찰청&lt;/option&gt;
+&lt;option value=&#34;http://www.dgpolice.go.kr&#34;&gt;대구지방경찰청&lt;/option&gt;
+&lt;option value=&#34;http://www.icpolice.go.kr&#34;&gt;인천지방경찰청&lt;/option&gt;
+&lt;option value=&#34;http://www.gjpolice.go.kr&#34;&gt;광주지방경찰청&lt;/option&gt;
+&lt;option value=&#34;http://www.djpolice.go.kr&#34;&gt;대전지방경찰청&lt;/option&gt;
+&lt;option value=&#34;http://www.uspolice.go.kr&#34;&gt;울산지방경찰청&lt;/option&gt;
+&lt;option value=&#34;http://www.ggpolice.go.kr&#34;&gt;경기남부지방경찰청&lt;/option&gt;
+&lt;option value=&#34;http://www.ggbpolice.go.kr&#34;&gt;경기북부지방경찰청&lt;/option&gt;
+&lt;option value=&#34;http://www.gwpolice.go.kr&#34;&gt;강원지방경찰청&lt;/option&gt;
+&lt;option value=&#34;http://www.cbpolice.go.kr&#34;&gt;충북지방경찰청&lt;/option&gt;
+&lt;option value=&#34;http://www.cnpolice.go.kr&#34;&gt;충남지방경찰청&lt;/option&gt;
+&lt;option value=&#34;http://www.jbpolice.go.kr&#34;&gt;전북지방경찰청&lt;/option&gt;
+&lt;option value=&#34;http://www.jnpolice.go.kr&#34;&gt;전남지방경찰청&lt;/option&gt;
+&lt;option value=&#34;http://www.gbpolice.go.kr&#34;&gt;경북지방경찰청&lt;/option&gt;
+&lt;option value=&#34;http://www.gnpolice.go.kr&#34;&gt;경남지방경찰청&lt;/option&gt;
+&lt;option value=&#34;http://www.jjpolice.go.kr&#34;&gt;제주지방경찰청&lt;/option&gt;
+&lt;option value=&#34;http://www.police.ac.kr&#34;&gt;경찰대학&lt;/option&gt;
+&lt;option value=&#34;http://www.pti.go.kr&#34;&gt;경찰교육원&lt;/option&gt;
+&lt;option value=&#34;http://www.cpa.go.kr&#34;&gt;중앙경찰학교&lt;/option&gt;
+&lt;option value=&#34;http://www.kpia.go.kr/&#34;&gt;경찰수사연수원&lt;/option&gt;
+&lt;option value=&#34;http://www.koroad.or.kr&#34;&gt;도로교통공단&lt;/option&gt;
+&lt;option value=&#34;http://www.nph.go.kr&#34;&gt;경찰병원&lt;/option&gt;
+&lt;/optgroup&gt;
+&lt;/select&gt;
+&lt;button class=&#34;go_select&#34; title=&#34;지방청/부속기관 관련 사이트 새창&#34; type=&#34;button&#34;&gt;GO&lt;/button&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;select title=&#34;업무 관련 사이트&#34;&gt;
+&lt;optgroup label=&#34;업무 관련 사이트&#34;&gt;
+&lt;option value=&#34;#&#34;&gt;업무 관련 사이트&lt;/option&gt;
+&lt;option value=&#34;http://www.police.go.kr/commission/main.do&#34;&gt;경찰위원회&lt;/option&gt;
+&lt;option value=&#34;http://www.ctrc.go.kr&#34;&gt;사이버테러대응센터&lt;/option&gt;
+&lt;option value=&#34;http://www.kpsi.go.kr/&#34;&gt;경찰과학수사&lt;/option&gt;
+&lt;option value=&#34;http://www.safe182.go.kr/&#34;&gt;안전 Dream&lt;/option&gt;
+&lt;option value=&#34;http://www.policemuseum.go.kr/kr/&#34;&gt;경찰박물관&lt;/option&gt;
+&lt;option value=&#34;http://www.police.go.kr/HR&#34;&gt;인권센터&lt;/option&gt;
+&lt;option value=&#34;http://cyberbureau.police.go.kr/&#34;&gt;사이버안전국&lt;/option&gt;
+&lt;option value=&#34;http://net-durumi.netan.go.kr/&#34;&gt;넷두루미&lt;/option&gt;
+&lt;option value=&#34;http://susa.go.kr&#34;&gt;수사구조개혁&lt;/option&gt;
+&lt;option value=&#34;http://www.112119.in/&#34;&gt;공상자후원회&lt;/option&gt;
+&lt;option value=&#34;http://www.chamsuri.co.kr/&#34;&gt;참수리사랑&lt;/option&gt;
+&lt;/optgroup&gt;
+&lt;/select&gt;
+&lt;button class=&#34;go_select&#34; title=&#34;업무 관련 사이트 새창&#34; type=&#34;button&#34;&gt;GO&lt;/button&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;!-- //go service --&gt;
+&lt;/div&gt;
+&lt;!-- //footer_content --&gt;
+&lt;/footer&gt;
+&lt;!-- //푸터 영역 끝 --&gt;
+&lt;!-- footer //--&gt;
+&lt;/div&gt;
+&lt;div class=&#34;loading&#34; id=&#34;loading&#34; style=&#34;position: absolute; display:none;&#34;&gt;
+&lt;h2&gt;화면을 불러오는 중 입니다. 잠시만 기다려 주세요.&lt;/h2&gt;
+&lt;img alt=&#34;loading&#34; src=&#34;/images/sub/loading.gif&#34;/&gt;
+&lt;/div&gt;
+&lt;div class=&#34;loading_spin&#34; id=&#34;loading_spin&#34; style=&#34;position: absolute;&#34;&gt;&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
 </div>
+
+</div>
+
+</div>
+</div>
+
+</div></section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="3.1-Parsing-&#46108;-html-&#47928;&#49436;&#50640;&#49436;-&#50896;&#54616;&#45716;-&#51221;&#48372;-scrap&#54616;&#44592;">3.1 Parsing &#46108; html &#47928;&#49436;&#50640;&#49436; &#50896;&#54616;&#45716; &#51221;&#48372; scrap&#54616;&#44592;<a class="anchor-link" href="#3.1-Parsing-&#46108;-html-&#47928;&#49436;&#50640;&#49436;-&#50896;&#54616;&#45716;-&#51221;&#48372;-scrap&#54616;&#44592;">&#182;</a></h2><ul>
+<li>방법 2: 해당 page의 Chrome의 개발자 도구로 돌아가서 Elements tab을 보자.<ul>
+<li>Elements에는 html문서가 parsing되어서 나타나있다.<br> 아래 fig.에 빨간 동그라미가 쳐져있는 부분(단축키 <code>Ctrl</code> + <code>Shift</code> + <code>C</code>)를 누르고 화면에서 찾고자 하는 부분을 클릭하면 해당 html 문서의 부분이 나타나게 된다.
+<img src="./201806_LOST112/figure5.PNG"></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+</div></section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="3.1-Parsing-&#46108;-html-&#47928;&#49436;&#50640;&#49436;-&#50896;&#54616;&#45716;-&#51221;&#48372;-scrap&#54616;&#44592;">3.1 Parsing &#46108; html &#47928;&#49436;&#50640;&#49436; &#50896;&#54616;&#45716; &#51221;&#48372; scrap&#54616;&#44592;<a class="anchor-link" href="#3.1-Parsing-&#46108;-html-&#47928;&#49436;&#50640;&#49436;-&#50896;&#54616;&#45716;-&#51221;&#48372;-scrap&#54616;&#44592;">&#182;</a></h2><p><img src="./201806_LOST112/figure6.PNG"></p>
+<ul>
+<li>방법 2: 해당 page의 Chrome의 개발자 도구로 돌아가서 Elements tab을 보자.<ul>
+<li>fig.에 1에 해당하는 부분을 누르고, 찾고자하는 2. 관리번호를 누르면 Elements의 3.에 해당 위치가 나타나게 된다.</li>
+<li>이 때 우리가 원하는 관리번호는 <code>...&lt;div&gt;&lt;table&gt;&lt;thread&gt;&lt;tr&gt;&lt;th&gt;</code>에 위치해있다.</li>
+<li>우리는 CSS Selector를 이용해 해당 요소들을 추출할 수 있다.<div class="highlight"><pre><span></span><span class="n">soup</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;.type01 tr th&#39;</span><span class="p">)</span>
+</pre></div>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+</div></section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="3.2-CSS-Selector-&#49324;&#50857;&#48277;">3.2 CSS Selector &#49324;&#50857;&#48277;<a class="anchor-link" href="#3.2-CSS-Selector-&#49324;&#50857;&#48277;">&#182;</a></h2><p><img src="./201806_LOST112/figure6.PNG"></p>
+<ul>
+<li>우리가 원하는 관리번호는 <code>...&lt;div&gt;&lt;table&gt;&lt;thread&gt;&lt;tr&gt;&lt;th&gt;</code>에 위치해있다.</li>
+<li>CSS Selector를 사용하는 법은 다음과 같다. <a href="https://code.tutsplus.com/ko/tutorials/the-30-css-selectors-you-must-memorize--net-16048">CSS Selector</a></li>
+<li>아래의 <code>select</code>가 CSS Selector 기능을 제공하는 함수이고, 인자로 넘겨주느는 <code>div table thread tr th</code>는 상위 요소 <code>div</code>부터 하위 요소 <code>th</code>까지 추적한 결과이다.<br> 순서대로 적어야 하고, 모든 요소를 전부 적을 필요는 없다.</li>
+<li><code>.type01 tr th</code>에서 <code>.type01</code>은 table에 해당하는 class 값으로 select한다는 뜻이다.<br> id값으로 select할 경우는 <code>#type01</code>과 같이 사용하면 된다. 좀 더 자세한 사용법은 위의 link를 참고하자.</li>
+<li>아래 결과는 해당 문서에서 모두 동일한 결과를 나타낸다.</li>
+<li>찾은 결과가 여러개일 경우 순서대로 <code>list</code> 형태로 결과값을 돌려준다.</li>
+<li><strong>요소이름에 공백이 들어간 경우 <code>```를</code>.```으로 대체해서 검색한다.</strong><div class="highlight"><pre><span></span><span class="n">soup</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;div table thead tr th&#39;</span><span class="p">)</span>
+<span class="n">soup</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;div thead tr th&#39;</span><span class="p">)</span>
+<span class="n">soup</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;.type01 thead tr th&#39;</span><span class="p">)</span>
+</pre></div>
+</li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">soup</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;table tr th&#39;</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[9]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[&lt;th class=&#34;first&#34; scope=&#34;col&#34;&gt;관리번호&lt;/th&gt;,
+ &lt;th scope=&#34;col&#34;&gt;습득물명&lt;/th&gt;,
+ &lt;th scope=&#34;col&#34;&gt;분실자명&lt;/th&gt;,
+ &lt;th scope=&#34;col&#34;&gt;보관장소&lt;/th&gt;,
+ &lt;th scope=&#34;col&#34;&gt;연락처&lt;/th&gt;,
+ &lt;th scope=&#34;col&#34;&gt;주운일자&lt;/th&gt;]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div></section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="3.3-Item-&#52628;&#52636;&#48277;">3.3 Item &#52628;&#52636;&#48277;<a class="anchor-link" href="#3.3-Item-&#52628;&#52636;&#48277;">&#182;</a></h2><ul>
+<li>앞에서 배운 방법으로 이번엔 첫 번째 분실물에 대한 요소를 추적하면 <code>tbody tr td</code>에 해당한다. </li>
+<li>한 줄당 6개 columns으로 10줄, 총 60개의 <code>td</code> 요소가 찾아진다. 첫번째 요소를 살펴보자.</li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">soup</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;tbody tr td&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[10]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&lt;td class=&#34;first &#34; scope=&#34;row&#34; title=&#34;V0002502D06280018&#34;&gt;&lt;a href=&#34;javascript:fn_find_detail(&#39;V0002502D06280018&#39;, &#39;1&#39;)&#34;&gt;V0002502D06280018&lt;/a&gt;&lt;/td&gt;</pre>
+</div>
+
 </div>
 
 </div>
 </div>
 
 </div><div class="fragment">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>우리가 원하는 일련번호는 <code>&lt;td title="..."&gt;&lt;a href="..."&gt;...&lt;/a&gt;&lt;/td&gt;</code>에서 <code>td</code>안에 <code>title</code>과 <code>a</code>안에 <code>href</code>의 값으로, 마지막으로 가장바깥에 <code>text</code>형태로 주어져있다.</li>
+<li>요소 안에 있는 값을 가져오기 위해서는 <code>get</code>함수를 쓰면 된다.<ul>
+<li><code>class</code>나 <code>id</code>같은 경우 여러 값들을 가질 수 있는데 공백<code></code>으로 구분한다.<br> 따라서 <code></code>이 있을 경우 조심하도록 하자.</li>
+</ul>
+</li>
+<li>마지막으로 <code>text</code>는 아래와 같이 가져올 수 있다.</li>
+</ul>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">soup</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;tbody tr td&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">)</span>
 </pre></div>
 
 </div>
 </div>
 </div>
 
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[11]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&#39;V0002502D06280018&#39;</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>jupyter nbconvert Untitled.ipynb --to html
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">soup</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;tbody tr td&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[12]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&#39;V0002502D06280018&#39;</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div></div></section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="3.4-&#45936;&#51060;&#53552;-&#51221;&#51228;">3.4 &#45936;&#51060;&#53552; &#51221;&#51228;<a class="anchor-link" href="#3.4-&#45936;&#51060;&#53552;-&#51221;&#51228;">&#182;</a></h2><ul>
+<li>6개 항목을 추출할 때 모두 똑같은 모양으로 생기지는 않았지만,<br> 지금까지 학습을 잘 했다면 <code>soup.select('.type01 tr td')</code> <br>또는 <code>soup.select('.type01 tr td a')</code>의 <code>.text</code>로 6개 항목을 모두 추출할 수 있다는 것을 <strong>본능적으로</strong> 느낄 수 있다.</li>
+<li>앞에서 배운 내용을 토대로 <code>replace</code> 함수를 통해 값을 정제하고,<br> 60개짜리 <code>list</code>를 10 x 6짜리 list로 <code>range</code>함수를 이용한 약간의 트릭을 써서 변환시켜준다.</li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">temp</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\r</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;.type01 tr td&#39;</span><span class="p">)]</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="n">temp</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">n</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">temp</span><span class="p">),</span><span class="n">n</span><span class="p">)]</span>
+<span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[13]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[&#39;V0002502D06280018&#39;,
+ &#39;카카오뱅크 라이언카드&#39;,
+ &#39;-&#39;,
+ &#39;CGV(신촌점)&#39;,
+ &#39;02-373-2995&#39;,
+ &#39;2018-06-26&#39;]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div></section></section><section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="4.-&#52572;&#51333;-&#53076;&#46300;">4. &#52572;&#51333; &#53076;&#46300;<a class="anchor-link" href="#4.-&#52572;&#51333;-&#53076;&#46300;">&#182;</a></h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span> <span class="k">as</span> <span class="nn">rq</span> <span class="c1"># 웹페이지 불러오는 용도</span>
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="k">import</span> <span class="n">BeautifulSoup</span> <span class="c1"># html문서 파싱하는 용도</span>
+<span class="kn">import</span> <span class="nn">time</span> <span class="c1"># 트래픽 관리 용도</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">head</span> <span class="o">=</span> <span class="s1">&#39;https://www.lost112.go.kr/find/findList.do&#39;</span>
+<span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;PRDT_CL_NM=&amp;PRDT_CL_CD01=&amp;PRDT_CL_CD02=&amp;START_YMD=20180612&amp;END_YMD=20180626&amp;PRDT_NM=&amp;DEP_PLACE=&amp;SITE=&amp;PLACE_SE_CD=&amp;FD_LCT_CD=&amp;IN_NM=&amp;ATC_ID=&amp;MDCD=&amp;SRNO=&amp;F_ATC_ID=&amp;pageIndex=1&amp;MENU_NO=&#39;</span>
+
+<span class="n">key</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;&amp;&quot;</span><span class="p">)]</span>
+<span class="n">key</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span><span class="n">key</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span><span class="n">key</span><span class="p">[</span><span class="mi">9</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span><span class="n">key</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;20180612&#39;</span><span class="p">,</span><span class="s1">&#39;20180612&#39;</span><span class="p">,</span><span class="s1">&#39;LCA000&#39;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span>
+<span class="n">key</span> <span class="o">=</span> <span class="s2">&quot;&amp;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;=&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">key</span><span class="p">])</span>
+<span class="n">url</span> <span class="o">=</span> <span class="n">head</span> <span class="o">+</span> <span class="s1">&#39;?&#39;</span> <span class="o">+</span> <span class="n">key</span>
+
+<span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">rq</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="p">,</span><span class="s1">&#39;html.parser&#39;</span><span class="p">)</span>
+<span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;.type01 tr th&#39;</span><span class="p">)]</span>
+<span class="n">last_page</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">soup</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;span .last&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;onclick&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;(&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;)&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">temp</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\r</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;.type01 tr td&#39;</span><span class="p">)]</span>
+
+<span class="n">result</span><span class="o">+=</span><span class="p">[</span><span class="n">temp</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">n</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">temp</span><span class="p">),</span><span class="n">n</span><span class="p">)]</span>
+<span class="k">for</span> <span class="n">page</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">last_page</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;&amp;&quot;</span><span class="p">)]</span>
+    <span class="n">key</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="s2">&quot;&amp;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;=&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">key</span><span class="p">])</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">head</span> <span class="o">+</span> <span class="s1">&#39;?&#39;</span> <span class="o">+</span> <span class="n">key</span>
+    <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">rq</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="p">,</span><span class="s1">&#39;html.parser&#39;</span><span class="p">)</span>
+    <span class="n">temp</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\r</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;.type01 tr td&#39;</span><span class="p">)]</span>
+    <span class="n">result</span><span class="o">+=</span><span class="p">[</span><span class="n">temp</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">n</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">temp</span><span class="p">),</span><span class="n">n</span><span class="p">)]</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="c1"># FOR MANAGEMENT THE TRAFFIC</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div></section><section>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">csv</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;result.csv&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">csvfile</span><span class="p">:</span>
+    <span class="n">csv_writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">csvfile</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">quotechar</span><span class="o">=</span><span class="s1">&#39;|&#39;</span><span class="p">,</span> <span class="n">quoting</span><span class="o">=</span><span class="n">csv</span><span class="o">.</span><span class="n">QUOTE_MINIMAL</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+        <span class="n">csv_writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div><div class="fragment">
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[16]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>head result.csv
 </pre></div>
 
 </div>
@@ -12190,8 +14240,49 @@ Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/js/reveal.
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>[NbConvertApp] Converting notebook Untitled.ipynb to html
-[NbConvertApp] Writing 280337 bytes to Untitled.html
+<pre>
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div><aside class="notes">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[19]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>jupyter nbconvert Findmybag.ipynb --to slides --output ../Ex1.findmybag
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[NbConvertApp] Converting notebook Find_my_back.ipynb to slides
+[NbConvertApp] Writing 398445 bytes to ../Ex1.lost112.slides.html
 </pre>
 </div>
 </div>
@@ -12200,6 +14291,7 @@ Copying: /opt/conda/lib/python3.6/site-packages/rise/static/reveal.js/js/reveal.
 </div>
 
 </div>
+</aside></div></section></section>
 </div>
 </div>
 
